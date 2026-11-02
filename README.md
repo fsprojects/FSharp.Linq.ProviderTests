@@ -45,8 +45,9 @@ A test compares a run with the baseline of the series of the FSharp.Core it runs
 
 - With **the build of FSharp.Core that recorded the baseline**, every difference is an error. A new SDK, a new provider
   or a changed scenario shows up, and the baseline is refreshed on purpose. The header of a baseline names the build
-  by its module version id (`# mvid`), because the version number is not enough: `main` of dotnet/fsharp and its pull
-  requests share one. `global.json` pins the SDK exactly for this reason.
+  (`# build`) by the commit in its version, or by the module version id when the version has no commit: the version
+  number alone is not enough, because `main` of dotnet/fsharp and its pull requests share one. `global.json` pins the
+  SDK exactly for this reason.
 - With **another build**, for example the one that a pull request to dotnet/fsharp makes, only regressions are
   errors: `ok` that is not `ok` any more, `fail` that returns wrong rows, and a scenario that is no longer run.
   Scenarios that start to work and changes of the SQL are printed in the test output.

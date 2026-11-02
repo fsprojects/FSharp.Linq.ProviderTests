@@ -101,11 +101,12 @@ module Repository =
 /// The FSharp.Core that the tests run against.
 type FSharpCoreVersion =
     {
-        /// The informational version of the assembly: 10.1.402-servicing.26505.111.
+        /// The informational version of the assembly: 10.1.402-servicing.26505.111+0123abc.
         Text: string
-        /// Names the build. The builds of two pull requests to dotnet/fsharp, and of main, can have the same version
-        /// number, but not the same module version id: the compiler makes it from the content of the assembly.
-        Mvid: Guid
+        /// Names the build. The version number cannot: main of dotnet/fsharp and its pull requests share one. The
+        /// commit that comes after the plus sign can, and it is the same on every system; when the version has none,
+        /// the module version id can, because the compiler makes it from the content of the assembly.
+        Build: string
         /// The major and minor part: the name of the directory of the baselines.
         Series: Version
     }
@@ -125,7 +126,7 @@ module FSharpCoreVersion =
         match leading.Match text with
         | m when m.Success ->
             { Text = text
-              Mvid = assembly.ManifestModule.ModuleVersionId
+              Build = if text.Contains '+' then text else $"{text} {assembly.ManifestModule.ModuleVersionId}"
               Series = Version(int m.Groups[1].Value, int m.Groups[2].Value) }
         | _ -> invalidOp $"Cannot read the version of FSharp.Core from '{text}'."
 
@@ -185,7 +186,7 @@ module Baseline =
             ValueSome nearest
 
     let private header (version: FSharpCoreVersion) (provider: string) =
-        [ $"# FSharp.Core {version.Text}"; $"# mvid {version.Mvid}"; $"# provider {provider}" ]
+        [ $"# FSharp.Core {version.Text}"; $"# build {version.Build}"; $"# provider {provider}" ]
 
     let private format (version: FSharpCoreVersion) (provider: string) (observations: Observation list) =
         let text = StringBuilder()
@@ -199,18 +200,16 @@ module Baseline =
         text.ToString()
 
     /// The FSharp.Core a baseline was recorded with, and its lines.
-    let private read (path: string) : struct (string voption * Guid voption * Observation list) =
+    let private read (path: string) : struct (string voption * string voption * Observation list) =
         let mutable recorded = ValueNone
-        let mutable mvid = ValueNone
+        let mutable build = ValueNone
         let observations = List<Observation>()
 
         for line in File.ReadAllLines path do
             if line.StartsWith("# FSharp.Core ", StringComparison.Ordinal) then
                 recorded <- ValueSome(line.Substring "# FSharp.Core ".Length)
-            elif line.StartsWith("# mvid ", StringComparison.Ordinal) then
-                match Guid.TryParse(line.AsSpan "# mvid ".Length) with
-                | true, id -> mvid <- ValueSome id
-                | _ -> ()
+            elif line.StartsWith("# build ", StringComparison.Ordinal) then
+                build <- ValueSome(line.Substring "# build ".Length)
             elif line.Length > 0 && line[0] <> '#' then
                 let parts = line.Split '\t'
 
@@ -226,7 +225,7 @@ module Baseline =
                           Detail = if parts.Length > 3 then parts[3] else "" }
                 | ValueNone -> invalidOp $"{path}: cannot read the status '{parts[2]}' in: {line}"
 
-        struct (recorded, mvid, List.ofSeq observations)
+        struct (recorded, build, List.ofSeq observations)
 
     let private shorten (text: string) =
         if text.Length > 300 then text.Substring(0, 300) + "..." else text
@@ -334,11 +333,11 @@ module Baseline =
                     { Passed = allowNoBaseline
                       Report = summary + $"There is no baseline {path}. Set {UpdateVariable}=1 to record one.\n" }
                 else
-                    let struct (recorded, mvid, baseline) = read path
+                    let struct (recorded, build, baseline) = read path
 
                     let mode =
-                        match mvid with
-                        | ValueSome id when id = version.Mvid -> Mode.Exact
+                        match build with
+                        | ValueSome id when String.Equals(id, version.Build, StringComparison.Ordinal) -> Mode.Exact
                         | _ -> Mode.Regressions
 
                     let recordedText =

@@ -1,5 +1,5 @@
 # FSharp.Core 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
-# mvid 96ff69b8-2487-4833-5c78-93c16fdd5aff
+# build 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
 # provider efcore-sqlite-async
 Projection	scalar	ok	SELECT "c"."Name" FROM "Customer" AS "c"
 Projection	entity	ok	SELECT "c"."Id", "c"."Age", "c"."City", "c"."Name", "c"."Registered" FROM "Customer" AS "c"
