@@ -101,10 +101,11 @@ module Repository =
 /// The FSharp.Core that the tests run against.
 type FSharpCoreVersion =
     {
-        /// The informational version of the assembly, with the hash of the commit it was built from:
-        /// 10.1.402-servicing.26505.111+0123abc. The builds of two pull requests to dotnet/fsharp have the same
-        /// version number and not the same hash.
+        /// The informational version of the assembly: 10.1.402-servicing.26505.111.
         Text: string
+        /// Names the build. The builds of two pull requests to dotnet/fsharp, and of main, can have the same version
+        /// number, but not the same module version id: the compiler makes it from the content of the assembly.
+        Mvid: Guid
         /// The major and minor part: the name of the directory of the baselines.
         Series: Version
     }
@@ -122,7 +123,10 @@ module FSharpCoreVersion =
             | attribute -> attribute.InformationalVersion
 
         match leading.Match text with
-        | m when m.Success -> { Text = text; Series = Version(int m.Groups[1].Value, int m.Groups[2].Value) }
+        | m when m.Success ->
+            { Text = text
+              Mvid = assembly.ManifestModule.ModuleVersionId
+              Series = Version(int m.Groups[1].Value, int m.Groups[2].Value) }
         | _ -> invalidOp $"Cannot read the version of FSharp.Core from '{text}'."
 
 /// How a run is compared with the baseline.
@@ -181,7 +185,7 @@ module Baseline =
             ValueSome nearest
 
     let private header (version: FSharpCoreVersion) (provider: string) =
-        [ $"# FSharp.Core {version.Text}"; $"# provider {provider}" ]
+        [ $"# FSharp.Core {version.Text}"; $"# mvid {version.Mvid}"; $"# provider {provider}" ]
 
     let private format (version: FSharpCoreVersion) (provider: string) (observations: Observation list) =
         let text = StringBuilder()
@@ -195,13 +199,18 @@ module Baseline =
         text.ToString()
 
     /// The FSharp.Core a baseline was recorded with, and its lines.
-    let private read (path: string) : string voption * Observation list =
+    let private read (path: string) : struct (string voption * Guid voption * Observation list) =
         let mutable recorded = ValueNone
+        let mutable mvid = ValueNone
         let observations = List<Observation>()
 
         for line in File.ReadAllLines path do
             if line.StartsWith("# FSharp.Core ", StringComparison.Ordinal) then
                 recorded <- ValueSome(line.Substring "# FSharp.Core ".Length)
+            elif line.StartsWith("# mvid ", StringComparison.Ordinal) then
+                match Guid.TryParse(line.AsSpan "# mvid ".Length) with
+                | true, id -> mvid <- ValueSome id
+                | _ -> ()
             elif line.Length > 0 && line[0] <> '#' then
                 let parts = line.Split '\t'
 
@@ -217,7 +226,7 @@ module Baseline =
                           Detail = if parts.Length > 3 then parts[3] else "" }
                 | ValueNone -> invalidOp $"{path}: cannot read the status '{parts[2]}' in: {line}"
 
-        recorded, List.ofSeq observations
+        struct (recorded, mvid, List.ofSeq observations)
 
     let private shorten (text: string) =
         if text.Length > 300 then text.Substring(0, 300) + "..." else text
@@ -325,11 +334,11 @@ module Baseline =
                     { Passed = allowNoBaseline
                       Report = summary + $"There is no baseline {path}. Set {UpdateVariable}=1 to record one.\n" }
                 else
-                    let recorded, baseline = read path
+                    let struct (recorded, mvid, baseline) = read path
 
                     let mode =
-                        match recorded with
-                        | ValueSome text when String.Equals(text, version.Text, StringComparison.Ordinal) -> Mode.Exact
+                        match mvid with
+                        | ValueSome id when id = version.Mvid -> Mode.Exact
                         | _ -> Mode.Regressions
 
                     let recordedText =
