@@ -23,12 +23,15 @@ type private InMemoryRewriter() =
 
 /// An in-memory query that stays on the provider that created it and prints its root by name.
 [<Sealed>]
-type CapturedQuery<'T>(provider: IQueryProvider, name: string, items: seq<'T>, derived: Expression voption) =
+type CapturedQuery<'T>(provider: IQueryProvider, name: string, items: seq<'T>, derived: Expression voption, scanned: Expression -> unit) =
 
-    let enumerate () =
+    let enumerate (self: Expression) =
         match derived with
         | ValueSome expression -> provider.Execute<IEnumerable<'T>>(expression).GetEnumerator()
-        | ValueNone -> items.GetEnumerator()
+        | ValueNone ->
+            // No operator runs at the provider here: whoever enumerates the source takes all of its rows
+            scanned self
+            items.GetEnumerator()
 
     override _.ToString() =
         match derived with
@@ -49,8 +52,8 @@ type CapturedQuery<'T>(provider: IQueryProvider, name: string, items: seq<'T>, d
 
         member _.ElementType = typeof<'T>
         member _.Provider = provider
-        member _.GetEnumerator() : IEnumerator<'T> = enumerate ()
-        member _.GetEnumerator() : IEnumerator = enumerate ()
+        member this.GetEnumerator() : IEnumerator<'T> = enumerate (Expression.Constant this)
+        member this.GetEnumerator() : IEnumerator = enumerate (Expression.Constant this)
 
 /// Executes in memory, and records what it was asked to execute.
 [<Sealed>]
@@ -72,14 +75,19 @@ type CapturingQueryProvider() =
         finally
             depth <- depth - 1
 
-    /// The expressions executed directly, not from inside another execution.
+    /// The expressions executed directly, not from inside another execution, and the sources that were enumerated.
     member _.Executed = executed :> IReadOnlyList<Expression>
 
+    /// A source that is enumerated as it is, without an operator
+    member _.Scanned(source: Expression) =
+        if depth = 0 then
+            executed.Add source
+
     member this.Source(name: string, items: seq<'T>) : IQueryable<'T> =
-        CapturedQuery<'T>(this, name, items, ValueNone)
+        CapturedQuery<'T>(this, name, items, ValueNone, this.Scanned)
 
     member this.Derived<'T>(expression: Expression) : IQueryable<'T> =
-        CapturedQuery<'T>(this, "", Seq.empty, ValueSome expression)
+        CapturedQuery<'T>(this, "", Seq.empty, ValueSome expression, this.Scanned)
 
     interface IQueryProvider with
         member this.CreateQuery<'T>(expression: Expression) : IQueryable<'T> = this.Derived<'T> expression
@@ -217,7 +225,7 @@ module ProviderShape =
                 | _ -> ValueNone
             | _ -> ValueNone
 
-        member _.Violations = found |> Seq.distinct |> List.ofSeq
+        member _.Violations = List.ofSeq found
 
         override _.VisitLambda<'T>(node: Expression<'T>) =
             let added = bind node.Parameters
@@ -354,46 +362,97 @@ module ProviderShape =
     let private yields (elementType: Type) (source: Expression) =
         typedefof<IEnumerable<_>>.MakeGenericType(elementType).IsAssignableFrom source.Type
 
-    type private OperatorCalls() =
+    /// Whether the lambda gives the parameter at the index back as it is.
+    let private returnsParameterAt index (lambda: LambdaExpression) =
+        index < lambda.Parameters.Count && obj.ReferenceEquals(lambda.Body, lambda.Parameters.[index])
+
+    /// A query that is its own root, as opposed to one built from another by operators.
+    let private isRoot (query: IQueryable) =
+        match query.Expression with
+        | :? ConstantExpression as root -> obj.ReferenceEquals(root.Value, query)
+        | _ -> false
+
+    /// The lambda that a call gives when the provider computes it before it translates, as it does for a selector
+    /// that reads nothing of the tree: a nested lambda that the compiler turned into a call. Nothing, if the call
+    /// fails.
+    let private computedLambda (node: Expression) =
+        if typeof<LambdaExpression>.IsAssignableFrom node.Type && isComputedByProvider node then
+            try
+                match Expression.Lambda(node).Compile().DynamicInvoke() with
+                | :? LambdaExpression as lambda -> ValueSome lambda
+                | _ -> ValueNone
+            with _ ->
+                ValueNone
+        else
+            ValueNone
+
+    /// Finds members read from elements that an earlier operator built without naming them: the provider has to
+    /// take apart an object it was not told how to. Every chain of operators is followed, the ones inside lambdas
+    /// and the ones of a query captured from earlier too, and each parameter of a lambda is tied to the sequence
+    /// it stands for, which is not always the first source of the operator.
+    type private UnnamedMemberFinder() =
         inherit ExpressionVisitor()
 
-        member val Calls = ResizeArray<MethodCallExpression>()
-
-        override this.VisitMethodCall node =
-            if isLinqOperator node then
-                this.Calls.Add node
-
-            base.VisitMethodCall node
-
-    /// Members read from elements that an earlier operator built without naming them:
-    /// the provider has to take apart an object it was not told how to.
-    let private unnamedMemberReads (expression: Expression) =
         let found = ResizeArray<Violation>()
 
-        let rec producesUnnamed (expression: Expression) =
-            match expression with
+        // Whether the elements are unnamed, for the parameters that stand for a sequence: the group of a GroupJoin
+        let sequences = Dictionary<ParameterExpression, bool>(HashIdentity.Reference)
+
+        let lambdaAt (call: MethodCallExpression) index =
+            if index < call.Arguments.Count then
+                match call.Arguments.[index] with
+                | Lambda lambda -> ValueSome lambda
+                | :? MethodCallExpression as computed -> computedLambda computed
+                | _ -> ValueNone
+            else
+                ValueNone
+
+        // The parameter of the lambda stands for an element of the sequence, which was built without names
+        let report (lambda: LambdaExpression) index (sequence: Expression) (unnamed: bool) =
+            if unnamed && index < lambda.Parameters.Count then
+                let parameter = lambda.Parameters.[index]
+
+                if yields parameter.Type sequence && readsMemberOf parameter lambda.Body then
+                    found.Add(Violation.ReadsUnnamedMember parameter.Type.Name)
+
+        member _.Found = List.ofSeq found
+
+        /// Whether the elements of the sequence were built without naming their members.
+        member this.Unnamed(sequence: Expression) : bool =
+            match sequence with
             | :? MethodCallExpression as call when isLinqOperator call ->
                 let source = call.Arguments.[0]
-                let sourceUnnamed = producesUnnamed source
 
                 let lambdas =
-                    [ for argument in Seq.skip 1 call.Arguments do
-                          match argument with
-                          | Lambda lambda -> lambda
-                          | _ -> () ]
+                    [ for index in 1 .. call.Arguments.Count - 1 do
+                          match lambdaAt call index with
+                          | ValueSome lambda -> lambda
+                          | ValueNone -> () ]
 
-                if sourceUnnamed then
-                    for lambda in lambdas do
-                        let element = lambda.Parameters.[0]
-
-                        if yields element.Type source && readsMemberOf element lambda.Body then
-                            found.Add(Violation.ReadsUnnamedMember element.Type.Name)
+                // A function of an element of each of two sequences gives unnamed elements when it builds them without
+                // names, and when it gives back one of its parameters of which the sequence has unnamed elements
+                let unnamedResult (result: LambdaExpression) (second: Expression) =
+                    buildsUnnamed result.Body
+                    || (returnsParameterAt 0 result && this.Unnamed source)
+                    || (returnsParameterAt 1 result && this.Unnamed second)
 
                 match call.Method.Name with
-                | "Select"
-                | "SelectMany"
+                | "Select" ->
+                    lambdas
+                    |> List.tryLast
+                    |> Option.exists (fun selector -> buildsUnnamed selector.Body || (returnsParameterAt 0 selector && this.Unnamed source))
+                | "SelectMany" ->
+                    match lambdas with
+                    | [ collection ] -> this.Unnamed collection.Body
+                    | [ collection; result ] -> unnamedResult result collection.Body
+                    | _ -> false
                 | "Join"
-                | "GroupJoin" -> lambdas |> List.last |> _.Body |> buildsUnnamed
+                | "Zip" -> lambdas |> List.tryLast |> Option.exists (fun result -> unnamedResult result call.Arguments.[1])
+                // The second parameter is the group of the matching inner elements, which no element is
+                | "GroupJoin" ->
+                    lambdas
+                    |> List.tryLast
+                    |> Option.exists (fun result -> buildsUnnamed result.Body || (returnsParameterAt 0 result && this.Unnamed source))
                 | "Where"
                 | "OrderBy"
                 | "OrderByDescending"
@@ -404,23 +463,122 @@ module ProviderShape =
                 | "Take"
                 | "TakeWhile"
                 | "Distinct"
-                | "DefaultIfEmpty" -> sourceUnnamed
+                | "DefaultIfEmpty"
+                | "Reverse"
+                | "AsQueryable"
+                | "AsEnumerable" -> this.Unnamed source
+                | "Concat"
+                | "Union"
+                | "Intersect"
+                | "Except" -> this.Unnamed source || (call.Arguments.Count > 1 && this.Unnamed call.Arguments.[1])
                 | _ -> false
+            | :? ConstantExpression as constant ->
+                match constant.Value with
+                | :? IQueryable as query when not (isRoot query) -> this.Unnamed query.Expression
+                | _ -> false
+            | :? ParameterExpression as parameter ->
+                match sequences.TryGetValue parameter with
+                | true, unnamed -> unnamed
+                | _ -> false
+            | :? UnaryExpression as conversion when conversion.NodeType = ExpressionType.Convert -> this.Unnamed conversion.Operand
             | _ -> false
 
-        // The chains of operators inside lambdas are checked like the query's own
-        let calls = OperatorCalls()
-        calls.Visit expression |> ignore
+        /// Reports the members that the lambdas of the operator read from elements built without names.
+        member this.Check(call: MethodCallExpression) =
+            let source = call.Arguments.[0]
 
-        for call in calls.Calls do
-            producesUnnamed call |> ignore
+            match call.Method.Name with
+            | "Join"
+            | "GroupJoin" when call.Arguments.Count >= 5 ->
+                let outer, inner = call.Arguments.[0], call.Arguments.[1]
+                let outerUnnamed, innerUnnamed = this.Unnamed outer, this.Unnamed inner
 
-        found |> Seq.distinct |> List.ofSeq
+                lambdaAt call 2 |> ValueOption.iter (fun key -> report key 0 outer outerUnnamed)
+                lambdaAt call 3 |> ValueOption.iter (fun key -> report key 0 inner innerUnnamed)
+
+                lambdaAt call 4
+                |> ValueOption.iter (fun result ->
+                    report result 0 outer outerUnnamed
+
+                    if call.Method.Name = "Join" then
+                        report result 1 inner innerUnnamed
+                    elif result.Parameters.Count > 1 then
+                        // The second parameter is the group of the matching inner elements, not one of them
+                        sequences.[result.Parameters.[1]] <- innerUnnamed)
+            | "SelectMany" when call.Arguments.Count >= 3 ->
+                // A collection selector, then a result selector over the element and an element of the collection
+                let sourceUnnamed = this.Unnamed source
+                let collection = lambdaAt call 1
+                collection |> ValueOption.iter (fun selector -> report selector 0 source sourceUnnamed)
+
+                lambdaAt call 2
+                |> ValueOption.iter (fun result ->
+                    report result 0 source sourceUnnamed
+
+                    collection
+                    |> ValueOption.iter (fun selector -> report result 1 selector.Body (this.Unnamed selector.Body)))
+            | "Zip" when call.Arguments.Count = 3 ->
+                let second = call.Arguments.[1]
+
+                lambdaAt call 2
+                |> ValueOption.iter (fun result ->
+                    report result 0 source (this.Unnamed source)
+                    report result 1 second (this.Unnamed second))
+            // The function takes the accumulated value, then an element. With no seed the accumulated value starts as
+            // an element, and a seed is of a type of its own, which is no element.
+            | "Aggregate" ->
+                let sourceUnnamed = this.Unnamed source
+                let seeded = call.Arguments.Count > 2
+
+                lambdaAt call (if seeded then 2 else 1)
+                |> ValueOption.iter (fun func ->
+                    if not seeded then
+                        report func 0 source sourceUnnamed
+
+                    report func 1 source sourceUnnamed)
+            | _ ->
+                let sourceUnnamed = this.Unnamed source
+
+                for index in 1 .. call.Arguments.Count - 1 do
+                    lambdaAt call index |> ValueOption.iter (fun lambda -> report lambda 0 source sourceUnnamed)
+
+        override this.VisitMethodCall node =
+            if isLinqOperator node then
+                this.Check node
+
+            // The lambda such a call gives is part of what the provider translates
+            match computedLambda node with
+            | ValueSome lambda -> this.Visit lambda |> ignore
+            | ValueNone -> ()
+
+            base.VisitMethodCall node
+
+        // A query built earlier and used in this one is part of what the provider translates.
+        override this.VisitConstant node =
+            match node.Value with
+            | :? IQueryable as query when not (isRoot query) -> this.Visit query.Expression |> ignore
+            | _ -> ()
+
+            node
+
+    let private unnamedMemberReads (expression: Expression) =
+        let finder = UnnamedMemberFinder()
+        finder.Visit expression |> ignore
+        finder.Found
 
     let violations (expression: Expression) =
         let visitor = ShapeVisitor()
         visitor.Visit expression |> ignore
-        visitor.Violations @ unnamedMemberReads expression |> List.distinct
+        visitor.Violations @ unnamedMemberReads expression
+
+    /// Whether the expression calls a Queryable operator that gives a value and not a query, as a provider is asked
+    /// to execute when a query is counted, summed or searched.
+    let isTerminalOperator (expression: Expression) =
+        match expression with
+        | :? MethodCallExpression as call ->
+            call.Method.DeclaringType = typeof<Queryable>
+            && not (typeof<IQueryable>.IsAssignableFrom call.Type)
+        | _ -> false
 
     /// The LINQ operators along the source chain, outermost last.
     let spine (expression: Expression) =

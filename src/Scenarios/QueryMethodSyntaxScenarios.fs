@@ -5,6 +5,7 @@ open System.Linq.Expressions
 
 let private block = [ Violation.Statement ExpressionType.Block ]
 
+
 let private customers (data: Data) = Seq.ofList data.Customers
 
 let cases () =

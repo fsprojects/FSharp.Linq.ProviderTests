@@ -58,6 +58,35 @@ module Scenario =
         else
             ValueNone
 
+    let rec private isPlain (ty: Type) =
+        ty.IsPrimitive
+        || ty.IsEnum
+        || ty = typeof<string>
+        || ty = typeof<decimal>
+        || ty = typeof<DateTime>
+        || ty = typeof<DateTimeOffset>
+        || ty = typeof<Guid>
+        || (match Nullable.GetUnderlyingType ty with
+            | null -> false
+            | underlying -> isPlain underlying)
+
+    /// An object of a class of the scenarios, with what it holds in the properties that give plain values. Its own
+    /// text says no more than the key of an entity, and a result that is wrong in any other property is not equal to
+    /// the right one.
+    [<return: Struct>]
+    let private (|Entity|_|) (value: obj) =
+        let ty = value.GetType()
+
+        if ty.IsClass && String.Equals(ty.Namespace, typeof<Customer>.Namespace, StringComparison.Ordinal) then
+            ValueSome(
+                ty.GetProperties(BindingFlags.Public ||| BindingFlags.Instance)
+                |> Seq.filter (fun property -> property.GetIndexParameters().Length = 0 && isPlain property.PropertyType)
+                |> Seq.map (fun property -> struct (property.Name, property.GetValue value))
+                |> Seq.toList
+            )
+        else
+            ValueNone
+
     /// Text that is equal for equal results, whichever provider materialized them.
     let rec render (value: obj) =
         let renderAll (values: seq<obj>) =
@@ -74,6 +103,9 @@ module Scenario =
             let rendered = fields |> Seq.map (fun (name, field) -> $"{name} = {render field}")
             $"""{{ {String.concat "; " rendered} }}"""
         | Union(case, fields) -> $"{case}({renderAll fields})"
+        | Entity properties ->
+            let rendered = properties |> Seq.map (fun (struct (name, property)) -> $"{name} = {render property}")
+            $"""{value.GetType().Name} {{ {String.concat "; " rendered} }}"""
         | value -> string value
 
     let rows name (run: Db -> IQueryable<'T>) (expected: Data -> seq<'T>) =
@@ -129,12 +161,23 @@ module Scenario =
                     { Expression = rows.Expression
                       Violations = (if stayed then [] else [ Violation.LeftProvider ])
                       Rows = [ for row in rows -> row ] }
-                // The value comes from the last execution; whatever ran before it went to the provider too.
+                // A query that is counted, summed or searched is executed by the operator that gives the value.
+                // Enumerating the rows of a query is an execution too, and so is every query that a function on the
+                // client runs while it goes through those rows: the provider made the value only if every
+                // execution is such an operator. The last one is the expression that is checked as a whole; whatever
+                // ran before it went to the provider too.
                 | Outcome.Value value when provider.Executed.Count > 0 ->
-                    let earlier = provider.Executed |> Seq.take (provider.Executed.Count - 1)
+                    let executed = List.ofSeq provider.Executed
+                    let last = List.last executed
+                    let earlier = List.take (executed.Length - 1) executed
 
-                    { Expression = provider.Executed.[provider.Executed.Count - 1]
-                      Violations = [ for expression in earlier do yield! ProviderShape.violations expression ]
+                    { Expression = last
+                      Violations =
+                        [ for expression in earlier do
+                              yield! ProviderShape.violations expression
+
+                          if not (List.forall ProviderShape.isTerminalOperator executed) then
+                              Violation.LeftProvider ]
                       Rows = [ value ] }
                 | Outcome.Value value ->
                     { Expression = Expression.Empty()
@@ -155,9 +198,10 @@ module Scenario =
     let failures (scenario: Scenario) =
         let data, observed = observe scenario
 
+        // Every occurrence counts: a tree with two blocks is not a tree with one
         let violations =
             observed.Violations @ ProviderShape.violations observed.Expression
-            |> List.distinct
+            |> List.sort
 
         let threw =
             violations
@@ -165,8 +209,8 @@ module Scenario =
                 | Violation.Throws _ -> true
                 | _ -> false)
 
-        [ if set violations <> set scenario.Violations then
-              $"violations: expected %A{scenario.Violations}, got %A{violations}"
+        [ if violations <> List.sort scenario.Violations then
+              $"violations: expected %A{List.sort scenario.Violations}, got %A{violations}"
 
           if not threw then
               let expected = inOrder scenario.Ordered (scenario.Expected data)

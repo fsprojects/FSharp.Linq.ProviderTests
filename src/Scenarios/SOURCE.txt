@@ -1,4 +1,4 @@
 dotnet/fsharp tests/FSharp.Core.UnitTests/FSharp.Core/Microsoft.FSharp.Linq
-commit e8b30cbc14dcf2eb09db3bfdf4d49b5dc24bb86f
-branch fix/query-integration-v5
+commit b6602256abaed276831fc2fe21a3d1bdde891332
+branch fix/query-integration-v7
 files QueryProviderShape.fs, QueryScenarioDomain.fs, QueryScenario.fs, QueryFSharpOperatorScenarios.fs, QueryKeyScenarios.fs, QueryMethodSyntaxScenarios.fs, QueryOperatorScenarios.fs, QueryProjectionScenarios.fs, QueryStructureScenarios.fs
