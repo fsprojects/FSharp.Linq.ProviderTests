@@ -101,7 +101,9 @@ module Repository =
 /// The FSharp.Core that the tests run against.
 type FSharpCoreVersion =
     {
-        /// The version without the hash of the commit: 10.1.402, or 11.0.200-ci.26551.3.
+        /// The informational version of the assembly, with the hash of the commit it was built from:
+        /// 10.1.402-servicing.26505.111+0123abc. The builds of two pull requests to dotnet/fsharp have the same
+        /// version number and not the same hash.
         Text: string
         /// The major and minor part: the name of the directory of the baselines.
         Series: Version
@@ -114,19 +116,14 @@ module FSharpCoreVersion =
     let current () : FSharpCoreVersion =
         let assembly = typeof<unit>.Assembly
 
-        let informational =
+        let text =
             match assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>() with
             | null -> assembly.GetName().Version.ToString()
             | attribute -> attribute.InformationalVersion
 
-        let text =
-            match informational.IndexOf '+' with
-            | -1 -> informational
-            | plus -> informational.Substring(0, plus)
-
         match leading.Match text with
         | m when m.Success -> { Text = text; Series = Version(int m.Groups[1].Value, int m.Groups[2].Value) }
-        | _ -> invalidOp $"Cannot read the version of FSharp.Core from '{informational}'."
+        | _ -> invalidOp $"Cannot read the version of FSharp.Core from '{text}'."
 
 /// How a run is compared with the baseline.
 [<RequireQualifiedAccess>]
