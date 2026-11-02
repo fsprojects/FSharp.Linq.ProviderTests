@@ -1,0 +1,25 @@
+<Project>
+
+  <!--
+    Keep this file small. dotnet/fsharp builds this repository with the compiler and the FSharp.Core it has just
+    built (UseLocalCompiler.Directory.Build.props, imported after this file) and checks that the local FSharp.Core
+    was restored. For that to work:
+      - FSharp.Core comes from the implicit reference of the SDK: no FSharp.Core PackageReference,
+        no DisableImplicitFSharpCoreReference, no FSharpCoreImplicitPackageVersion;
+      - no central package management, package source mapping or lock files: they would hide the local feed.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
+    <!-- The commit that dotnet/fsharp pins stays for months: new advisories and new warnings must not break it -->
+    <NuGetAudit>false</NuGetAudit>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+
+    <!-- A path map turns __SOURCE_DIRECTORY__ into /_/..., and the tests read files that sit next to the sources -->
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+    <DeterministicSourcePaths>false</DeterministicSourcePaths>
+  </PropertyGroup>
+
+</Project>

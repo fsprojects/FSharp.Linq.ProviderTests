@@ -1,0 +1,61 @@
+# FSharp.Core 10.1.402-servicing.26505.111
+# provider sqlprovider-sqlite
+Projection	a column	ok	SELECT [Customers].[Name] as 'Name' FROM main.Customers as [Customers]
+Projection	a tuple of columns	ok	SELECT [Customers].[Id] as 'Id',[Customers].[Name] as 'Name' FROM main.Customers as [Customers]
+Projection	an anonymous record	ok	SELECT [Customers].[Name] as 'Name',[Customers].[Age] as 'Age' FROM main.Customers as [Customers]
+Projection	a column that can be null	ok	SELECT [Customers].[Name] as 'Name',[Customers].[Registered] as 'Registered' FROM main.Customers as [Customers]
+Operator	where with a comparison	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Age] > @param1))
+Operator	where with and, or	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[City] = @param1 OR ([c].[City] = @param2 AND [c].[Age] > @param3)))
+Operator	where with not	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[City] <> @param1))
+Operator	where with a text search	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Name] LIKE @param1))
+Operator	where over a column that can be null	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Registered] IS NOT NULL))
+Operator	sortBy, thenBy and take	ok	SELECT [c].[City] as 'City',[c].[Name] as 'Name' FROM main.Customers as [c] ORDER BY [c].[City] , [c].[Age] DESC LIMIT 3;
+Operator	skip and take	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] ORDER BY [c].[Id] LIMIT 2 OFFSET 1;
+Operator	distinct	ok	SELECT DISTINCT [Customers].[City] as 'City' FROM main.Customers as [Customers]
+Operator	count	ok	SELECT COUNT(1) FROM main.Customers as [c] WHERE (([c].[Age] > @param1))
+Operator	sumBy	ok	SELECT SUM([o].[Total]) as '[o].[SUM_Total]' FROM main.Orders as [o]
+Operator	exists	ok	SELECT [Customers].[Age] as 'Age',[Customers].[City] as 'City',[Customers].[Id] as 'Id',[Customers].[Name] as 'Name',[Customers].[Registered] as 'Registered' FROM main.Customers as [Customers] WHERE (([Customers].[City] = @param1)) LIMIT 1;
+Key	groupBy with a count	ok	SELECT [City] as '[City]', COUNT(1) as 'COUNT_City' FROM main.Customers as [Customers] GROUP BY [City]
+Structure	an inner join	ok	SELECT [c].[Name] as '[c].[Name]',[o].[Total] as '[o].[Total]' FROM main.Customers as [c] INNER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId]
+Structure	a navigation property	ok	SELECT [argN].[Name] as '[argN].[Name]',[argN].[Id] as '[argN].[Id]' FROM main.Customers as [argN] INNER JOIN [main].[Orders] as [argN] on [argN].[CustomerId] = [argN].[Id]
+Structure	navigation properties two levels deep	ok	SELECT [argN].[Name] as '[argN].[Name]',[argN].[Quantity] as '[argN].[Quantity]' FROM main.Customers as [argN] INNER JOIN [main].[Orders] as [argN] on [argN].[CustomerId] = [argN].[Id] INNER JOIN [main].[OrderLines] as [argN] on [argN].[OrderId] = [argN].[Id]
+Structure	a left outer join keeps the row without a match	ok	SELECT [c].[Name] as '[c].[Name]',[o].[Id] as '[o].[Id]' FROM main.Customers as [c] LEFT OUTER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId]
+Structure	a group join flattened is an inner join	ok	SELECT [c].[Name] as '[c].[Name]',[o].[Id] as '[o].[Id]' FROM main.Customers as [c] INNER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId]
+Structure	three tables joined	ok	SELECT [c].[Name] as '[c].[Name]',[p].[Name] as '[p].[Name]' FROM main.Customers as [c] INNER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId] INNER JOIN [main].[OrderLines] as [l] on [o].[Id] = [l].[OrderId] INNER JOIN [main].[Products] as [p] on [l].[ProductId] = [p].[Id]
+Structure	two tables that nothing joins	ok	SELECT [Customers].[Name] as '[Customers].[Name]',[Products].[Name] as '[Products].[Name]' FROM main.Customers as [Customers] , main.Products as [Products] WHERE (([Customers].[City] = @param1 AND [Products].[Category] = @param2))
+MethodSyntax	Where and Select	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Age] > @param1))
+Projection	an arithmetic expression	ok	SELECT [Customers].[Name] as 'Name',[Customers].[Age] as 'Age' FROM main.Customers as [Customers]
+Projection	a text expression	ok	SELECT [Customers].[Name] as 'Name' FROM main.Customers as [Customers]
+Projection	a constant next to a column	ok	SELECT [Customers].[Name] as 'Name' FROM main.Customers as [Customers]
+Projection	a record	ok	SELECT [Customers].[Name] as 'Name',[Customers].[Age] as 'Age' FROM main.Customers as [Customers]
+Projection	a nested tuple	ok	SELECT [Customers].[Id] as 'Id',[Customers].[Name] as 'Name',[Customers].[City] as 'City' FROM main.Customers as [Customers]
+Operator	where with a captured value	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[City] = @param1))
+Operator	where in a list	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[City] IN (@param1,@param2)))
+Operator	where in a subquery	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Id] IN (SELECT [o].[CustomerId] as [result] FROM main.Orders as [o] )))
+Operator	sortByDescending	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] ORDER BY [c].[Age] DESC
+Operator	head	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] ORDER BY [c].[Id] LIMIT 1;
+Operator	exactlyOne	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Id] = @param1))
+Operator	headOrDefault of nothing	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] WHERE (([c].[Id] = @param1)) LIMIT 1;
+Operator	maxBy	ok	SELECT MAX([c].[Age]) as '[c].[MAX_Age]' FROM main.Customers as [c]
+Operator	minBy	ok	SELECT MIN([c].[Age]) as '[c].[MIN_Age]' FROM main.Customers as [c]
+Operator	averageBy	ok	SELECT AVG([o].[Total]) as '[o].[AVG_Total]' FROM main.Orders as [o]
+Operator	all	ok	SELECT [Customers].[Age] as 'Age',[Customers].[City] as 'City',[Customers].[Id] as 'Id',[Customers].[Name] as 'Name',[Customers].[Registered] as 'Registered' FROM main.Customers as [Customers] WHERE (([Customers].[Age] <= @param1)) LIMIT 1;
+Operator	contains	ok	SELECT COUNT(1) FROM main.Customers as [Customers] WHERE (([Customers].[Name] = @param1)) LIMIT 1;
+Operator	count of distinct values	ok	SELECT COUNT(DISTINCT [c].[City]) FROM main.Customers as [c]
+Key	groupBy with a sum	ok	SELECT [City] as '[City]', SUM([Age]) as 'SUM_Age' FROM main.Customers as [Customers] GROUP BY [City]
+Key	groupBy with a maximum and an average	ok	SELECT [City] as '[City]', AVG([Age]) as 'AVG_Age', MAX([Age]) as 'MAX_Age' FROM main.Customers as [Customers] GROUP BY [City]
+Key	groupBy with having	ok	SELECT [City] as '[City]', COUNT(1) as 'COUNT_City' FROM main.Customers as [Customers] GROUP BY [City] HAVING ((COUNT(1) > @param1))
+Key	groupBy after where	ok	SELECT [c].[City] as '[c].[City]', COUNT(1) as '[c].[COUNT_City]' FROM main.Customers as [c] WHERE (([c].[Age] > @param1)) GROUP BY [c].[City]
+Key	groupBy over a join	ok	SELECT [c].[Name] as '[c].[Name]', SUM([o].[Total]) as '[o].[SUM_Total]' FROM main.Customers as [c] INNER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId] GROUP BY [c].[Name]
+Structure	a left outer join counted per group	ok	SELECT [c].[Name] as '[c].[Name]', COUNT(1) as '[c].[COUNT_Name]' FROM main.Customers as [c] LEFT OUTER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId] GROUP BY [c].[Name]
+Structure	two left outer joins in a row	ok	SELECT [c].[Name] as '[c].[Name]',[o].[Id] as '[o].[Id]',[l].[Id] as '[l].[Id]' FROM main.Customers as [c] LEFT OUTER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId] LEFT OUTER JOIN [main].[OrderLines] as [l] on [o].[Id] = [l].[OrderId]
+Structure	a navigation property as an outer join	ok	SELECT [argN].[Name] as '[argN].[Name]',[argN].[Id] as '[argN].[Id]' FROM main.Customers as [argN] LEFT OUTER JOIN [main].[Orders] as [argN] on [argN].[CustomerId] = [argN].[Id]
+Structure	a navigation property to the parent	ok	SELECT [argN].[Id] as '[argN].[Id]',[argN].[Name] as '[argN].[Name]' FROM main.Orders as [argN] INNER JOIN [main].[Customers] as [argN] on [argN].[CustomerId] = [argN].[Id]
+Structure	a join written as a condition	ok	SELECT [Customers].[Name] as '[Customers].[Name]',[Orders].[Id] as '[Orders].[Id]' FROM main.Customers as [Customers] , main.Orders as [Orders] WHERE (([Customers].[Id] = [Orders].[CustomerId]))
+Structure	three tables that nothing joins	ok	SELECT [Customers].[Name] as '[Customers].[Name]',[Orders].[Id] as '[Orders].[Id]',[Products].[Name] as '[Products].[Name]' FROM main.Customers as [Customers] , main.Orders as [Orders] , main.Products as [Products] WHERE (([Customers].[City] = @param1 AND ([Customers].[Id] = [Orders].[CustomerId] AND [Products].[Category] = @param3)))
+Structure	a join with conditions on both sides	ok	SELECT [c].[Name] as '[c].[Name]',[o].[Id] as '[o].[Id]' FROM main.Customers as [c] INNER JOIN [main].[Orders] as [o] on [c].[Id] = [o].[CustomerId] WHERE (([c].[City] = @param1 AND [o].[Total] > @param2))
+MethodSyntax	OrderBy and Select	ok	SELECT [c].[Name] as 'Name' FROM main.Customers as [c] ORDER BY [c].[Age]
+MethodSyntax	Any	ok	SELECT [Customers].[Age] as 'Age',[Customers].[City] as 'City',[Customers].[Id] as 'Id',[Customers].[Name] as 'Name',[Customers].[Registered] as 'Registered' FROM main.Customers as [Customers] WHERE (([Customers].[City] = @param1)) LIMIT 1;
+MethodSyntax	Sum	ok	SELECT SUM([o].[Total]) as '[o].[SUM_Total]' FROM main.Orders as [o]
+FSharpOperator	int of a column	ok	SELECT [Customers].[Age] as 'Age' FROM main.Customers as [Customers]
+FSharpOperator	float of a column	ok	SELECT [Orders].[Id] as 'Id' FROM main.Orders as [Orders]

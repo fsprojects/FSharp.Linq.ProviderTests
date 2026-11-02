@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up the .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      # Only the Linux job has an emulator: the vNext emulator runs in Docker. The Windows runner skips the test
+      - name: Start the Azure Cosmos DB Emulator
+        if: runner.os == 'Linux'
+        shell: pwsh
+        run: ./.github/scripts/start-cosmos-emulator.ps1
+
+      - name: Wait for the Azure Cosmos DB Emulator
+        if: runner.os == 'Linux'
+        uses: ./.github/actions/setup-cosmos-emulator
+
+      - name: Test the providers
+        run: dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release
+        env:
+          # On Linux a missing emulator is an error, not a skipped test
+          COSMOS_EMULATOR_REQUIRED: ${{ runner.os == 'Linux' && '1' || '' }}
+
+      - name: Test SQLProvider
+        run: dotnet test tests/SQLProviderTests/FSharp.Linq.ProviderTests.SQLProvider.fsproj -c Release
+
+      # What each provider did with every query, in the format of the baselines: the way to get a new baseline
+      - name: Upload what the providers did
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actual-${{ matrix.os }}
+          path: artifacts/actual/*.tsv
+          if-no-files-found: warn

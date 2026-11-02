@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Scenarios/FSharp.Linq.ProviderTests.Scenarios.fsproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj" />
+    <Project Path="tests/SQLProviderTests/FSharp.Linq.ProviderTests.SQLProvider.fsproj" />
+  </Folder>
+</Solution>

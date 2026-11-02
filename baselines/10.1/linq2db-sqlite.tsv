@@ -1,0 +1,229 @@
+# FSharp.Core 10.1.402-servicing.26505.111
+# provider linq2db-sqlite
+Projection	scalar	ok	SELECT [c_1].[Name] FROM [Customer] [c_1]
+Projection	entity	ok	SELECT [c_1].[Id], [c_1].[Name], [c_1].[City], [c_1].[Age], [c_1].[Registered] FROM [Customer] [c_1]
+Projection	computed scalars	ok	SELECT Coalesce([after_1].[Name], '') || '!', [after_1].[Age] + 1, CASE WHEN [after_1].[Age] > 28 THEN 'senior' ELSE 'junior' END FROM [Customer] [after_1]
+Projection	let in select	ok	SELECT Upper([c_1].[Name]) FROM [Customer] [c_1]
+Projection	tuple of two	ok	SELECT [after_1].[Id], [after_1].[Name] FROM [Customer] [after_1]
+Projection	tuple of seven	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[City], [after_1].[Age], [after_1].[Id] + 100, Length([after_1].[Name]), [after_1].[Age] * 2 FROM [Customer] [after_1]
+Projection	tuple of eight	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[City], [after_1].[Age], [after_1].[Id] + 100, Length([after_1].[Name]), [after_1].[Age] * 2, [after_1].[Id] * 7 FROM [Customer] [after_1]
+Projection	tuple of nine	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[City], [after_1].[Age], [after_1].[Id] + 100, Length([after_1].[Name]), [after_1].[Age] * 2, [after_1].[Id] * 7, [after_1].[Age] - [after_1].[Id] FROM [Customer] [after_1]
+Projection	nested tuple	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1]
+Projection	struct tuple of two	fail Exception	unreachable
+Projection	struct tuple of nine	fail Exception	unreachable
+Projection	struct tuple inside a tuple	fail Exception	unreachable
+Projection	tuple inside a struct tuple	fail Exception	unreachable
+Projection	tuple taken apart by the next for	ok	SELECT [tupledArg].[Name] FROM [Customer] [tupledArg] WHERE [tupledArg].[Id] > 1
+Projection	struct tuple taken apart by the next for	fail Exception	unreachable
+Projection	tuple of nine taken apart by the next for	ok	SELECT [tupledArg].[Name] FROM [Customer] [tupledArg] WHERE [tupledArg].[Id] > 1
+Projection	record read by the next for	ok	SELECT [p].[Name] FROM [Customer] [p] WHERE [p].[Age] > 26
+Projection	anonymous record read by the next for	ok	SELECT [p].[Name] FROM [Customer] [p] WHERE [p].[Age] > 26
+Projection	record, fields in declaration order	ok	SELECT [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1]
+Projection	record, fields out of declaration order	ok	SELECT [c_1].[Age], [c_1].[Name] FROM [Customer] [c_1]
+Projection	record, fields out of declaration order, read by the next where	fail LinqToDBException	The LINQ expression 'person.PersonAge' could not be converted to SQL.
+Projection	record of three, fields rotated	ok	SELECT [c_1].[City], [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+Projection	record holding a tuple	ok	SELECT [after_1].[Age], [after_1].[Id], [after_1].[Name] FROM [Customer] [after_1]
+Projection	anonymous record, fields in alphabetical order	ok	SELECT [after_1].[Age], [after_1].[Name] FROM [Customer] [after_1]
+Projection	anonymous record, fields out of alphabetical order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+Projection	anonymous record, fields out of alphabetical order, read by the next where	fail LinqToDBException	The LINQ expression 'person.Age' could not be converted to SQL.
+Projection	anonymous record, method calls in fields out of order	ok	SELECT Upper([c_1].[Name]), Trim([c_1].[City]) FROM [Customer] [c_1]
+Projection	anonymous record inside an anonymous record	ok	SELECT [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1]
+Projection	struct anonymous record, fields in alphabetical order	ok	SELECT [after_1].[Age], [after_1].[Name] FROM [Customer] [after_1]
+Projection	struct anonymous record, fields out of alphabetical order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+Projection	CLIMutable record, fields in declaration order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+Projection	CLIMutable record, fields out of declaration order	ok	SELECT [c_1].[Age], [c_1].[Name] FROM [Customer] [c_1]
+Projection	class with property initializers	ok	SELECT [c_1].[Age], [c_1].[Name] FROM [Customer] [c_1]
+Projection	option	ok	SELECT [c_1].[Age] FROM [Customer] [c_1]
+Operator	where	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Age] > 26
+Operator	where with string methods	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Name] LIKE 'A%' ESCAPE '~' OR [c_1].[City] = 'Paris'
+Operator	where on a nullable property	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Registered] IS NOT NULL AND CAST(strftime('%Y', [c_1].[Registered]) AS INTEGER) > 2020
+Operator	where with a nullable operator	ok	SELECT [l].[Id] FROM [OrderLine] [l] WHERE [l].[Discount] > 1
+Operator	where with a let	fail LinqToDBException	The LINQ expression 'age > 26' could not be converted to SQL.
+Operator	if then	ok	SELECT [argN].[Name] FROM [Customer] [argN] WHERE [argN].[Age] > 26
+Operator	sortBy, thenByDescending	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] ORDER BY [c_1].[City], [c_1].[Age] DESC
+Operator	sortByDescending, thenBy	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] ORDER BY [c_1].[City] DESC, [c_1].[Age]
+Operator	sortByNullable, thenByNullableDescending	ok	SELECT [l].[Id] FROM [OrderLine] [l] ORDER BY [l].[Discount], [l].[Id] DESC
+Operator	sortByNullableDescending, thenByNullable	ok	SELECT [l].[Id] FROM [OrderLine] [l] ORDER BY [l].[Discount] DESC, [l].[Id]
+Operator	distinct	ok	SELECT DISTINCT [c_1].[City] FROM [Customer] [c_1]
+Operator	skip, take	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] ORDER BY [c_1].[Id] LIMIT @take OFFSET @skip
+Operator	skipWhile, takeWhile	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Customer>() .OrderBy(c => c.Id) .SkipWhile(c => c.Id < 2) .TakeWhile(c => c.Id < 4) .Select(c => c.Name)
+Operator	join	ok	SELECT [after_1].[Id], [l].[Id] FROM [Order] [after_1] INNER JOIN [OrderLine] [l] ON [after_1].[Id] = [l].[OrderId]
+Operator	groupJoin	ok	SELECT [after_1].[Id], ( SELECT COUNT(*) FROM [OrderLine] [l] WHERE [after_1].[Id] = [l].[OrderId] ) FROM [Order] [after_1]
+Operator	leftOuterJoin	ok	SELECT [after_1].[Id], [argN].[Id], [argN].[OrderId], [argN].[ProductId], [argN].[Quantity], [argN].[Price], [argN].[Discount] FROM [Order] [after_1] LEFT JOIN [OrderLine] [argN] ON [after_1].[Id] = [argN].[OrderId]
+Operator	leftOuterJoin tested with isNull	ok	SELECT [after_1].[Id], [argN].[Id], [argN].[OrderId], [argN].[ProductId], [argN].[Quantity], [argN].[Price], [argN].[Discount] FROM [Order] [after_1] LEFT JOIN [OrderLine] [argN] ON [after_1].[Id] = [argN].[OrderId]
+Operator	count	ok	SELECT COUNT(*) FROM [Customer] [c_1] WHERE [c_1].[Age] > 26
+Operator	exists	ok	SELECT EXISTS( SELECT * FROM [Customer] [c_1] WHERE [c_1].[City] = 'Paris' )
+Operator	exists on a nullable property	ok	SELECT EXISTS( SELECT * FROM [Customer] [c_1] WHERE [c_1].[Registered] IS NOT NULL AND CAST(strftime('%Y', [c_1].[Registered]) AS INTEGER) > 2020 )
+Operator	exists with a let	fail LinqToDBException	The LINQ expression 'city == /* Operators.op_Equality(...) */ "Paris"' could not be converted to SQL.
+Operator	all	ok	SELECT NOT EXISTS( SELECT * FROM [Customer] [c_1] WHERE [c_1].[Age] <= 26 )
+Operator	contains	ok	SELECT CASE WHEN 2 IN ( SELECT [c_1].[Id] FROM [Customer] [c_1] ) THEN 1 ELSE 0 END
+Operator	find	ok	SELECT [c_1].[Id], [c_1].[Name], [c_1].[City], [c_1].[Age], [c_1].[Registered] FROM [Customer] [c_1] WHERE [c_1].[Age] < 30 LIMIT 1
+Operator	head	ok	SELECT [t1].[Id], [t1].[Name], [t1].[City], [t1].[Age], [t1].[Registered] FROM [Customer] [t1] ORDER BY [t1].[Id] LIMIT 1
+Operator	headOrDefault	ok	SELECT [c_1].[Id], [c_1].[Name], [c_1].[City], [c_1].[Age], [c_1].[Registered] FROM [Customer] [c_1] WHERE [c_1].[Age] > 100 LIMIT 1
+Operator	last	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Customer>() .OrderBy(c => c.Id) .Last()
+Operator	lastOrDefault	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Customer>() .Where(c => c.Age > 100) .LastOrDefault()
+Operator	exactlyOne	ok	SELECT [c_1].[Id], [c_1].[Name], [c_1].[City], [c_1].[Age], [c_1].[Registered] FROM [Customer] [c_1] WHERE [c_1].[City] = 'Paris' LIMIT 2
+Operator	exactlyOneOrDefault	ok	SELECT [c_1].[Id], [c_1].[Name], [c_1].[City], [c_1].[Age], [c_1].[Registered] FROM [Customer] [c_1] WHERE [c_1].[City] = 'Rome' LIMIT 2
+Operator	nth	ok	SELECT [t1].[Id], [t1].[Name], [t1].[City], [t1].[Age], [t1].[Registered] FROM [Customer] [t1] ORDER BY [t1].[Id] LIMIT 1 OFFSET @skip
+Operator	minBy	ok	SELECT MIN([t1].[Age]) FROM [Customer] [t1]
+Operator	maxBy	ok	SELECT MAX([t1].[Age]) FROM [Customer] [t1]
+Operator	sumBy	ok	SELECT SUM([t1].[Age]) FROM [Customer] [t1]
+Operator	averageBy	ok	SELECT AVG(CAST([t1].[Age] AS Float)) FROM [Customer] [t1]
+Operator	minByNullable	ok	SELECT MIN([t1].[Discount]) FROM [OrderLine] [t1]
+Operator	maxByNullable	ok	SELECT MAX([t1].[Discount]) FROM [OrderLine] [t1]
+Operator	sumByNullable	ok	SELECT SUM([t1].[Discount]) FROM [OrderLine] [t1]
+Operator	averageByNullable	ok	SELECT AVG(CAST([t1].[Discount] AS Float)) FROM [OrderLine] [t1]
+Key	join on a scalar	ok	SELECT [after_1].[Name], [o].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [o] ON [after_1].[Id] = [o].[CustomerId]
+Key	join on a tuple	ok	SELECT [after_1].[Id], [l].[Id] FROM [Order] [after_1] INNER JOIN [OrderLine] [l] ON [after_1].[Id] = [l].[OrderId] AND [after_1].[CustomerId] = [l].[Quantity]
+Key	join on a struct tuple	ok	SELECT [after_1].[Id], [l].[Id] FROM [Order] [after_1] INNER JOIN [OrderLine] [l] ON [after_1].[Id] = [l].[OrderId] AND [after_1].[CustomerId] = [l].[Quantity]
+Key	join on a record, fields in declaration order	ok	SELECT [after_1].[Id], [l].[Id] FROM [Order] [after_1] INNER JOIN [OrderLine] [l] ON [after_1].[Id] = [l].[OrderId] AND [after_1].[CustomerId] = [l].[Quantity]
+Key	join on a record, fields out of declaration order	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: $Path$->{var Units; ... }->Equal->{var Units; ... }
+Key	join on an anonymous record, fields in alphabetical order	ok	SELECT [after_1].[Id], [l].[Id] FROM [Order] [after_1] INNER JOIN [OrderLine] [l] ON [after_1].[Id] = [l].[OrderId] AND [after_1].[CustomerId] = [l].[Quantity]
+Key	join on an anonymous record, fields out of alphabetical order	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: $Path$->{var Units; ... }->Equal->{var Units; ... }
+Key	join on an anonymous record that one side gets from a function	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: $Path$->{var Units; ... }->Equal->lineKey(Ref(SubQueryContext(498)(SC)::OrderLine))
+Key	groupJoin on a tuple	ok	SELECT [after_1].[Id], ( SELECT COUNT(*) FROM [OrderLine] [l] WHERE [after_1].[Id] = [l].[OrderId] AND [after_1].[CustomerId] = [l].[Quantity] ) FROM [Order] [after_1]
+Key	groupJoin on a record, fields out of declaration order	fail ArgumentException	must be reducible node
+Key	groupJoin on an anonymous record, fields out of alphabetical order	fail ArgumentException	must be reducible node
+Key	leftOuterJoin on a tuple	ok	SELECT [after_1].[Id], [argN].[Id], [argN].[OrderId], [argN].[ProductId], [argN].[Quantity], [argN].[Price], [argN].[Discount] FROM [Order] [after_1] LEFT JOIN [OrderLine] [argN] ON [after_1].[Id] = [argN].[OrderId] AND [after_1].[CustomerId] = [argN].[Quantity]
+Key	leftOuterJoin on a record, fields out of declaration order	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { int Units; Units = o.CustomerId; return new OrderAndQuantity( o.Id, Units ); } == { int Units; Units = l.Quantity; return new OrderAndQuantity( l.OrderId, Units ); }
+Key	leftOuterJoin on an anonymous record, fields out of alphabetical order	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { int Units; Units = o.CustomerId; return new { o.Id, Units }; } == { int Units; Units = l.Quantity; return new { l.OrderId, Units }; }
+Key	groupBy a scalar	ok	SELECT [after_1].[City], COUNT(*) FROM [Customer] [after_1] GROUP BY [after_1].[City]
+Key	groupBy a scalar, groups themselves	fail LinqToDBException	You should explicitly specify selected fields for server-side GroupBy() call or add AsEnumerable() call before GroupBy() to perform client-side grouping. Set Configuration.Linq.GuardGrouping = false to disable this check. Additionally this guard exception can be disabled by extension GroupBy(...).Di...
+Key	groupBy a tuple	ok	SELECT [after_1].[City], [after_1].[Item2], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] > 28 as [Item2] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[City], [after_1].[Item2]
+Key	groupBy a tuple, element of the key	ok	SELECT [after_1].[City], [after_1].[c1], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] > 28 as [c1] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[City], [after_1].[c1]
+Key	groupBy a struct tuple	ok	SELECT [after_1].[City], [after_1].[Item2], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] > 28 as [Item2] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[City], [after_1].[Item2]
+Key	groupBy a record, fields in declaration order	ok	SELECT [after_1].[City], [after_1].[KeyAge], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] / 10 as [KeyAge] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[City], [after_1].[KeyAge]
+Key	groupBy a record, fields out of declaration order	ok	SELECT [after_1].[Key_1], [after_1].[City], COUNT(*) FROM ( SELECT [g_1].[Age] / 10 as [Key_1], [g_1].[City] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[Key_1], [after_1].[City]
+Key	groupBy an anonymous record, fields in alphabetical order	ok	SELECT [after_1].[City], [after_1].[Decade], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] / 10 as [Decade] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[City], [after_1].[Decade]
+Key	groupBy an anonymous record, fields out of alphabetical order	ok	SELECT [after_1].[Key_1], [after_1].[City], COUNT(*) FROM ( SELECT [g_1].[Age] / 10 as [Key_1], [g_1].[City] FROM [Customer] [g_1] ) [after_1] GROUP BY [after_1].[Key_1], [after_1].[City]
+Key	groupValBy a tuple of values	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupValBy a tuple of values, sum of one of them	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupValBy a tuple of values, average of one of them	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupValBy a tuple of values, max of one of them	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupValBy a tuple of values, one of them selected then summed	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupValBy a tuple of values, counted with a predicate	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupBy after a join, key and count	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	groupBy after a join, sum over the joined side	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	Select written in the query keeps its projection	ok	SELECT [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1]
+Key	groups of groups counted against each other	fail LinqToDBException	The LINQ expression 'x.Key' could not be converted to SQL.
+Key	groups after a join as the result	ok	SELECT [m_1].[Key_1], [d].[Id], [d].[Name], [d].[City], [d].[Age], [d].[Registered], [o_1].[Id], [o_1].[CustomerId], [o_1].[Total] FROM ( SELECT DISTINCT [c_1].[City] as [Key_1] FROM [Customer] [c_1] INNER JOIN [Order] [o] ON [c_1].[Id] = [o].[CustomerId] ) [m_1] INNER JOIN [Customer] [d] ON [m_1].[Key_1] = [d].[City] OR [m_1].[Key_1] IS NULL AND [d].[City] IS NULL INNER JOIN [Order] [o_1] ON [d].[Id] = [o_1].[CustomerId] ;; SELECT DISTINCT [after_1].[City] FROM [Customer] [after_1] INNER JOIN [Order] [o] ON [after_1].[Id] = [o].[CustomerId]
+Key	groupValBy a tuple of values, the group compared with itself	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: $Path$->Ref(SubQueryContext(3199)(SC)::IGrouping`2)->Equal->Ref(SubQueryContext(3199)(SC)::IGrouping`2)
+Key	groups of groups, a group found among the groups it is in	fail LinqToDBException	The LINQ expression 'x.Key' could not be converted to SQL.
+Key	groupValBy a tuple of values, the group as a sequence is still the group	ok	SELECT [m_1].[Key_1], [d].[Name], [d].[Age] FROM ( SELECT DISTINCT [argN].[City] as [Key_1] FROM [Customer] [argN] ) [m_1] INNER JOIN [Customer] [d] ON [m_1].[Key_1] = [d].[City] OR [m_1].[Key_1] IS NULL AND [d].[City] IS NULL ;; SELECT DISTINCT [after_1].[City] FROM [Customer] [after_1]
+Key	groupBy a group, the group found among the elements it is the key of	fail LinqToDBException	The LINQ expression 'x.Key' could not be converted to SQL.
+Key	groupValBy records compared by reference, counted where an element is itself	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Key	find among the groups of a nested query	ok	SELECT [m_1].[Id], [d].[Id], [d].[CustomerId], [d].[Total] FROM ( SELECT DISTINCT [c_1].[Id] FROM [Customer] [c_1] WHERE ( SELECT COUNT(*) FROM [Order] [a_Orders] WHERE [c_1].[Id] = [a_Orders].[CustomerId] ) > 0 ) [m_1] INNER JOIN [Order] [d] ON [m_1].[Id] = [d].[CustomerId] ;; SELECT [after_1].[Name], [after_1].[Id] FROM [Customer] [after_1] WHERE ( SELECT COUNT(*) FROM [Order] [a_Orders] WHERE [after_1].[Id] = [a_Orders].[CustomerId] ) > 0
+Structure	two for	ok	SELECT [after_1].[Name], [argN].[Name] FROM [Customer] [after_1] CROSS JOIN [Product] [argN]
+Structure	two for, where over both	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1], [Order] [argN] WHERE [argN].[CustomerId] = [after_1].[Id]
+Structure	for, where, for, where	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1], [Order] [argN] WHERE [after_1].[Age] > 26 AND [argN].[CustomerId] = [after_1].[Id]
+Structure	for over a navigation collection	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [argN] ON [after_1].[Id] = [argN].[CustomerId]
+Structure	for over two levels of navigation collections	ok	SELECT [after_1].[Name], [x].[Id], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [x] ON [after_1].[Id] = [x].[CustomerId] INNER JOIN [OrderLine] [argN] ON [x].[Id] = [argN].[OrderId]
+Structure	three for	ok	SELECT [after_1].[Name], [x].[Id], [argN].[Id] FROM [Customer] [after_1], [Order] [x], [OrderLine] [argN] WHERE [x].[CustomerId] = [after_1].[Id] AND [argN].[OrderId] = [x].[Id]
+Structure	for after sortBy	ok	SELECT [after_1].[Name], [argN].[Name] FROM [Customer] [after_1] CROSS JOIN [Product] [argN] ORDER BY [after_1].[Age]
+Structure	for after join	ok	SELECT [after_1].[Name], [o].[Id], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [o] ON [after_1].[Id] = [o].[CustomerId] CROSS JOIN [OrderLine] [argN] WHERE [argN].[OrderId] = [o].[Id]
+Structure	let between for	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1], [Order] [argN] WHERE [argN].[Id] = [after_1].[Id] + 9
+Structure	if then around for	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [argN] ON [after_1].[Id] = [argN].[CustomerId] WHERE [after_1].[Age] > 26
+Structure	for around if then	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [argN] ON [argN].[CustomerId] = [after_1].[Id]
+Structure	yield! of a navigation collection	ok	SELECT [x].[Id], [x].[CustomerId], [x].[Total] FROM [Customer] [argN] INNER JOIN [Order] [x] ON [argN].[Id] = [x].[CustomerId]
+Structure	distinct and take after two for	ok	SELECT DISTINCT [Item1].[City] FROM [Customer] [Item1] INNER JOIN [Order] [argN] ON [Item1].[Id] = [argN].[CustomerId] LIMIT @take
+Structure	groupBy after two for	fail InvalidOperationException	There is no method 'AggregateExecute' on type 'LinqToDB.LinqExtensions' that matches the specified arguments
+Structure	count over two for	ok	SELECT COUNT(*) FROM [Customer] [Item1] INNER JOIN [Order] [argN] ON [Item1].[Id] = [argN].[CustomerId]
+Structure	exists over two for	ok	SELECT EXISTS( SELECT * FROM [Customer] [tupledArg] INNER JOIN [Order] [argN] ON [tupledArg].[Id] = [argN].[CustomerId] WHERE [argN].[Total] > 10 AND [tupledArg].[City] = 'London' )
+Structure	nested query as the source	ok	SELECT [o].[Id] FROM [Order] [o] WHERE [o].[Total] > 4
+Structure	nested query as the source of the second for	ok	SELECT [after_1].[Name], [argN].[Id] FROM [Customer] [after_1] INNER JOIN [Order] [argN] ON [argN].[CustomerId] = [after_1].[Id]
+Structure	nested query in select	ok	SELECT [m_1].[Id], [d].[Id] FROM ( SELECT DISTINCT [c_1].[Id] FROM [Customer] [c_1] ) [m_1] INNER JOIN [Order] [d] ON [d].[CustomerId] = [m_1].[Id] ;; SELECT [after_1].[Name], [after_1].[Id] FROM [Customer] [after_1]
+Structure	second for over a source filtered by a lambda	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	where with a lambda over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	where with All over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	select with Count over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	lambda over another source capturing a let	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	lambda nested two levels deep	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+Structure	where with a method whose lambda reads nothing of the query	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Age] > @p
+Structure	where with abs of a constant	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Age] > @p
+Structure	where with a lambda that reads nothing of the query and calls abs	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Order>() .Any(o => Operators.Abs$W<double>( abs: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Abs<double>(arg0_0)), value: o.Total - 10) < 6)
+Structure	left join spelled leftOuterJoin	ok	SELECT [after_1].[Name], [argN].[Id], [argN].[CustomerId], [argN].[Total] FROM [Customer] [after_1] LEFT JOIN [Order] [argN] ON [after_1].[Id] = [argN].[CustomerId]
+Structure	left join spelled groupJoin and DefaultIfEmpty	ok	SELECT [after_1].[Name], [argN].[Id], [argN].[CustomerId], [argN].[Total] FROM [Customer] [after_1] LEFT JOIN [Order] [argN] ON [after_1].[Id] = [argN].[CustomerId]
+Structure	two left joins spelled leftOuterJoin	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Customer>() .GroupJoin( inner: db .GetTable<Order>(), outerKeySelector: c => c.Id, innerKeySelector: o => o.CustomerId, resultSelector: (c, orders) => new AnonymousObject<Customer, IEnumerable<Order>>( Item1 = c, Item2 = ord...
+Structure	two left joins spelled groupJoin and DefaultIfEmpty	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Customer>() .GroupJoin( inner: db .GetTable<Order>(), outerKeySelector: c => c.Id, innerKeySelector: o => o.CustomerId, resultSelector: (c, orders) => new AnonymousObject<Customer, IEnumerable<Order>>( Item1 = c, Item2 = ord...
+Structure	join after a left join	ok	SELECT [after_1].[Name], [argN].[Id], [argN].[CustomerId], [argN].[Total], [p].[Name] FROM [Customer] [after_1] INNER JOIN [Order] [argN] ON [after_1].[Id] = [argN].[CustomerId] INNER JOIN [Product] [p] ON [after_1].[Id] = [p].[Id]
+Structure	tuple selected after where	ok	SELECT [after_1].[Id], [after_1].[Name] FROM [Customer] [after_1] WHERE [after_1].[Age] > 26
+Structure	struct tuple selected after where	fail Exception	unreachable
+Structure	record selected after sortBy	ok	SELECT [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1] ORDER BY [after_1].[Age]
+Structure	anonymous record selected after join	ok	SELECT [after_1].[Name], [o].[Total] FROM [Customer] [after_1] INNER JOIN [Order] [o] ON [after_1].[Id] = [o].[CustomerId]
+Structure	nested tuple selected	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[Age] FROM [Customer] [after_1]
+Structure	tuple of nine selected	ok	SELECT [after_1].[Id], [after_1].[Name], [after_1].[City], [after_1].[Age], [after_1].[Id] + 100, Length([after_1].[Name]), [after_1].[Age] * 2, [after_1].[Id] * 7, [after_1].[Age] - [after_1].[Id] FROM [Customer] [after_1]
+Structure	tuple selected after groupBy	ok	SELECT [after_1].[City], COUNT(*) FROM [Customer] [after_1] GROUP BY [after_1].[City]
+Structure	tuple selected before distinct	ok	SELECT DISTINCT [after_1].[City], [after_1].[Age] > 26 FROM [Customer] [after_1]
+Structure	sorted nested query of records selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.String,System.Collections.Generic.IEnumerable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32...
+Structure	all over two for	ok	SELECT NOT EXISTS( SELECT * FROM [Customer] [tupledArg] INNER JOIN [Order] [argN] ON [tupledArg].[Id] = [argN].[CustomerId] WHERE NOT ([argN].[Total] > 4 OR [tupledArg].[City] = 'Paris' AND [tupledArg].[City] IS NOT NULL) )
+Structure	sumBy over two for	ok	SELECT SUM([argN].[Total]) FROM [Customer] [Item1] INNER JOIN [Order] [argN] ON [Item1].[Id] = [argN].[CustomerId]
+Structure	averageBy after a join	ok	SELECT AVG([o].[Total]) FROM [Customer] [c_1] INNER JOIN [Order] [o] ON [c_1].[Id] = [o].[CustomerId]
+Structure	minByNullable over two for	ok	SELECT MIN([argN].[Discount]) FROM [Order] [Item1] INNER JOIN [OrderLine] [argN] ON [Item1].[Id] = [argN].[OrderId]
+Structure	sumByNullable after a join	ok	SELECT SUM([l].[Discount]) FROM [Order] [o] INNER JOIN [OrderLine] [l] ON [o].[Id] = [l].[OrderId]
+Structure	maxBy after a record select	ok	SELECT MAX([c_1].[Age]) FROM [Customer] [c_1]
+Structure	exists after a record select	ok	SELECT EXISTS( SELECT * FROM [Customer] [p] WHERE [p].[Age] > 30 )
+Structure	exists after a tuple select	fail LinqToDBException	The LINQ expression 'city == /* Operators.op_Equality(...) */ "Paris"' could not be converted to SQL.
+Structure	count after a tuple select	ok	SELECT COUNT(*) FROM [Customer] [c_1]
+MethodSyntax	Select a tuple	ok	SELECT [c_1].[Id], [c_1].[Name] FROM [Customer] [c_1]
+MethodSyntax	Select a struct tuple	ok	SELECT [c_1].[Id], [c_1].[Name] FROM [Customer] [c_1]
+MethodSyntax	Where over a query built earlier	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Id] IN ( SELECT [o].[CustomerId] FROM [Order] [o] WHERE [o].[Total] > 4 )
+MethodSyntax	Where over a query built earlier with a let	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: db .GetTable<Order>() .Where(o => { double total; total = o.Total; return total > 4; }) .Select(o => o.CustomerId) .Contains(c.Id)
+MethodSyntax	Select a record, fields in declaration order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+MethodSyntax	Select a record, fields out of declaration order	ok	SELECT [c_1].[Age], [c_1].[Name] FROM [Customer] [c_1]
+MethodSyntax	Select an anonymous record, fields in alphabetical order	ok	SELECT [c_1].[Age], [c_1].[Name] FROM [Customer] [c_1]
+MethodSyntax	Select an anonymous record, fields out of alphabetical order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+MethodSyntax	Select an anonymous record, method calls in fields out of order	ok	SELECT Upper([c_1].[Name]), Trim([c_1].[City]) FROM [Customer] [c_1]
+MethodSyntax	Select a struct anonymous record, fields out of alphabetical order	ok	SELECT [c_1].[Name], [c_1].[Age] FROM [Customer] [c_1]
+MethodSyntax	Select with a let used twice	ok	SELECT Upper([c_1].[Name]) FROM [Customer] [c_1]
+MethodSyntax	Select with a count in a let used twice	ok	SELECT ( SELECT COUNT(*) FROM [Order] [a_Orders] WHERE [c_1].[Id] = [a_Orders].[CustomerId] ) FROM [Customer] [c_1]
+MethodSyntax	Select with a call in a let used twice	ok	SELECT ( SELECT COUNT(*) FROM [Order] [a_Orders] WHERE [c_1].[Id] = [a_Orders].[CustomerId] ) FROM [Customer] [c_1]
+MethodSyntax	Select with nested lets	ok	SELECT [c_1].[Age] FROM [Customer] [c_1]
+MethodSyntax	Select on a nullable property	ok	SELECT [c_1].[Registered] FROM [Customer] [c_1]
+MethodSyntax	Where taking a tuple apart	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { int id; id = tupledArg.Item1; return { string _arg1; _arg1 = tupledArg.Item2; return id > 1; }}
+MethodSyntax	Where taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	OrderBy taking a tuple apart	wrong	SELECT [tupledArg].[Name], [tupledArg].[Age] FROM [Customer] [tupledArg] ORDER BY [tupledArg].[Name], [tupledArg].[Age]
+MethodSyntax	OrderBy taking a struct tuple apart	fail ArgumentException	The tuple index '1' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	GroupBy taking a tuple apart	wrong	SELECT [g_1].[City], [g_1].[Age], COUNT(*) FROM [Customer] [g_1] GROUP BY [g_1].[City], [g_1].[Age]
+MethodSyntax	GroupBy taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	Where reading a record	ok	SELECT [p].[Name], [p].[Age] FROM [Customer] [p] WHERE [p].[Age] > 26
+MethodSyntax	OrderBy reading a record	ok	SELECT [p].[Name] FROM [Customer] [p] ORDER BY [p].[Age]
+MethodSyntax	GroupBy reading a record	ok	SELECT [g_1].[City], COUNT(*) FROM [Customer] [g_1] GROUP BY [g_1].[City]
+MethodSyntax	Where reading an anonymous record	ok	SELECT [p].[Age], [p].[Name] FROM [Customer] [p] WHERE [p].[Age] > 26
+MethodSyntax	OrderBy reading an anonymous record	ok	SELECT [p].[Name] FROM [Customer] [p] ORDER BY [p].[Age]
+MethodSyntax	GroupBy reading an anonymous record	ok	SELECT [g_1].[City], COUNT(*) FROM [Customer] [g_1] GROUP BY [g_1].[City]
+MethodSyntax	Where taking the last of nine apart	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { int _arg11; _arg11 = tupledArg.Item1; return { string _arg12; _arg12 = tupledArg.Item2; return { string _arg13; _arg13 = tupledArg.Item3; return { int _arg14; _arg14 = tupledArg.Item4; return { int _arg15; _arg15 = tupledArg.Item5; ret...
+MethodSyntax	Where taking the last of a struct nine apart	fail ArgumentException	The tuple index '7' was out of range for tuple type 'System.ValueTuple`8[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Stri...
+MethodSyntax	Where over a query that selects a tuple	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { int id; id = tupledArg.Item1; return { string _arg29; _arg29 = tupledArg.Item2; return id > 1; }}
+MethodSyntax	Where over a query that selects a record	ok	SELECT [p].[Name], [p].[Age] FROM [Customer] [p] WHERE [p].[Age] > 26
+MethodSyntax	Where on a nullable property	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: { DateTime? copyOfStruct; copyOfStruct = c.Registered; return copyOfStruct.HasValue; }
+MethodSyntax	Where with a lambda over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+MethodSyntax	Select with a lambda over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+MethodSyntax	SelectMany with a lambda over another source	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression1' to type 'System.Linq.Expressions.LambdaExpression'.
+MethodSyntax	OrderBy, ThenByDescending	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] ORDER BY [c_1].[City], [c_1].[Age] DESC
+MethodSyntax	GroupBy a tuple	ok	SELECT [g_2].[City], [g_2].[c1], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] > 28 as [c1] FROM [Customer] [g_1] ) [g_2] GROUP BY [g_2].[City], [g_2].[c1]
+MethodSyntax	SelectMany over a navigation collection	ok	SELECT [a_Orders].[Id] FROM [Customer] [o] INNER JOIN [Order] [a_Orders] ON [o].[Id] = [a_Orders].[CustomerId]
+FSharpOperator	abs and sign in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Abs$W<int>( abs: FuncConvert.ToFSharpFunc<int, int>(arg0_0 => Operators.Abs<int>(arg0_0)), value: c.Age - 30) < 5
+FSharpOperator	min and max in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Max<int>( e1: c.Age, e2: 30) == 30
+FSharpOperator	abs, sign, min and max in select	ok	SELECT [after_1].[Age] - 30, [after_1].[Age] FROM [Customer] [after_1]
+FSharpOperator	floor and ceil in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Floor$W<double>( floor: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Floor<double>(arg0_0)), value: l.Price) == 2
+FSharpOperator	round and truncate in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Round$W<double>( round: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Round<double>(arg0_0)), value: l.Price * 1.1) == 3
+FSharpOperator	sqrt and ** in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Sqrt$W<double, double>( sqrt: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Sqrt<double, double>(arg0_0)), value: l.Price) > 1.6
+FSharpOperator	exp, log and log10 in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Exp$W<double>( exp: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Exp<double>(arg0_0)), value: (double)c.Age / 10) > 15
+FSharpOperator	sin, cos and tan in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Sin$W<double>( sin: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Sin<double>(arg0_0)), value: (double)c.Age) < 0
+FSharpOperator	asin, acos, atan and atan2 in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Asin$W<double>( asin: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Asin<double>(arg0_0)), value: tupledArg.Item2) > 0.26
+FSharpOperator	sinh, cosh and tanh in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Sinh$W<double>( sinh: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Sinh<double>(arg0_0)), value: (double)c.Age / 10) > 8
+FSharpOperator	sqrt, floor, ceil and truncate in select	ok	SELECT [after_1].[Price] FROM [OrderLine] [after_1]
+FSharpOperator	sqrt of a float32 in where	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Sqrt$W<float, float>( sqrt: FuncConvert.ToFSharpFunc<float, float>(arg0_0 => Operators.Sqrt<float, float>(arg0_0)), value: (float)l.Price)
+FSharpOperator	fst and snd after select into	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Fst<int, string>(new Tuple<int, string>( t.Item1, t.Item2 ))
+FSharpOperator	fst and snd of a let-bound tuple	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Fst<int, string>(new Tuple<int, string>( tupledArg.Item2.Item1, tupledArg.Item2.Item2 ))
+FSharpOperator	isNull in where	fail LinqToDBException	The LINQ expression 'Operators.IsNull<OrderLine>(tupledArg.Item3)' could not be converted to SQL.
+FSharpOperator	isNull of a boxed nullable in select	ok	SELECT [after_1].[Name], [after_1].[Registered] FROM [Customer] [after_1]
+FSharpOperator	box compared with null in where	fail LinqToDBException	The LINQ expression 'Operators.Box<OrderLine>(tupledArg.Item3)' could not be converted to SQL.
+FSharpOperator	boxed nullable compared with null in where	fail LinqToDBException	The LINQ expression 'Operators.Box<DateTime?>(c.Registered)' could not be converted to SQL.
+FSharpOperator	not in where	ok	SELECT [c_1].[Name] FROM [Customer] [c_1] WHERE [c_1].[Age] <= 28
+FSharpOperator	Where with abs and max	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Abs$W<int>( abs: FuncConvert.ToFSharpFunc<int, int>(arg0_0 => Operators.Abs<int>(arg0_0)), value: c.Age - 30) <= 2
+FSharpOperator	Where with sqrt and sin	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: Operators.Sqrt$W<double, double>( sqrt: FuncConvert.ToFSharpFunc<double, double>(arg0_0 => Operators.Sqrt<double, double>(arg0_0)), value: l.Price) > 1.6
+FSharpOperator	Select with floor and sign	ok	SELECT [l].[Id], [l].[Price], [l].[Quantity] - 2 FROM [OrderLine] [l]
+FSharpOperator	GroupBy a tuple, fst of the key	ok	SELECT [g_2].[City], [g_2].[c1], COUNT(*) FROM ( SELECT [g_1].[City], [g_1].[Age] > 28 as [c1] FROM [Customer] [g_1] ) [g_2] GROUP BY [g_2].[City], [g_2].[c1]
+FSharpOperator	Where with isNull	fail LinqToDBException	The LINQ expression '!(Operators.IsNull<string>(c.Name))' could not be converted to SQL.
+FSharpOperator	Where with box compared with null	fail LinqToDBException	The LINQ expression 'Operators.Box<DateTime?>(c.Registered)' could not be converted to SQL.

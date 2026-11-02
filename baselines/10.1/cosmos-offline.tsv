@@ -1,0 +1,229 @@
+# FSharp.Core 10.1.402-servicing.26505.111
+# provider cosmos-offline
+Projection	scalar	ok	SELECT VALUE root["Name"] FROM root
+Projection	entity	ok	SELECT VALUE root FROM root
+Projection	computed scalars	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	let in select	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	tuple of two	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	tuple of seven	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	tuple of eight	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	tuple of nine	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	nested tuple	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	struct tuple of two	fail Exception	unreachable
+Projection	struct tuple of nine	fail Exception	unreachable
+Projection	struct tuple inside a tuple	fail Exception	unreachable
+Projection	tuple inside a struct tuple	fail Exception	unreachable
+Projection	tuple taken apart by the next for	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	struct tuple taken apart by the next for	fail Exception	unreachable
+Projection	tuple of nine taken apart by the next for	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	record read by the next for	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	anonymous record read by the next for	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	record, fields in declaration order	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	record, fields out of declaration order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	record, fields out of declaration order, read by the next where	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	record of three, fields rotated	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	record holding a tuple	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	anonymous record, fields in alphabetical order	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	anonymous record, fields out of alphabetical order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	anonymous record, fields out of alphabetical order, read by the next where	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	anonymous record, method calls in fields out of order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	anonymous record inside an anonymous record	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	struct anonymous record, fields in alphabetical order	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	struct anonymous record, fields out of alphabetical order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	CLIMutable record, fields in declaration order	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	CLIMutable record, fields out of declaration order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Projection	class with property initializers	ok	SELECT VALUE {"ViewAge": root["Age"], "ViewName": root["Name"]} FROM root
+Projection	option	fail DocumentQueryException	Method 'Some' is not supported.
+Operator	where	ok	SELECT VALUE root["Name"] FROM root WHERE (root["Age"] > 26)
+Operator	where with string methods	ok	SELECT VALUE root["Name"] FROM root WHERE (STARTSWITH(root["Name"], "A") OR (root["City"] = "Paris"))
+Operator	where on a nullable property	ok	SELECT VALUE root["Name"] FROM root WHERE (IS_DEFINED(root["Registered"]) AND (root["Registered"]["Year"] > 2020))
+Operator	where with a nullable operator	ok	SELECT VALUE root["Id"] FROM root WHERE (root["Discount"] > 1)
+Operator	where with a let	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Operator	if then	ok	SELECT VALUE root["Name"] FROM root WHERE (root["Age"] > 26)
+Operator	sortBy, thenByDescending	ok	SELECT VALUE root["Name"] FROM root ORDER BY root["City"] ASC, root["Age"] DESC
+Operator	sortByDescending, thenBy	ok	SELECT VALUE root["Name"] FROM root ORDER BY root["City"] DESC, root["Age"] ASC
+Operator	sortByNullable, thenByNullableDescending	ok	SELECT VALUE root["Id"] FROM root ORDER BY root["Discount"] ASC, root["Id"] DESC
+Operator	sortByNullableDescending, thenByNullable	ok	SELECT VALUE root["Id"] FROM root ORDER BY root["Discount"] DESC, root["Id"] ASC
+Operator	distinct	ok	SELECT DISTINCT VALUE root["City"] FROM root
+Operator	skip, take	ok	SELECT VALUE root["Name"] FROM root ORDER BY root["Id"] ASC OFFSET 1 LIMIT 2
+Operator	skipWhile, takeWhile	fail DocumentQueryException	Method 'SkipWhile' is not supported.
+Operator	join	fail DocumentQueryException	Method 'Join' is not supported.
+Operator	groupJoin	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Operator	leftOuterJoin	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Operator	leftOuterJoin tested with isNull	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Operator	count	n/a	
+Operator	exists	n/a	
+Operator	exists on a nullable property	n/a	
+Operator	exists with a let	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Operator	all	fail DocumentQueryException	Method 'All' is not supported.
+Operator	contains	fail DocumentQueryException	Method 'Contains' is not supported.
+Operator	find	fail DocumentQueryException	Method 'First' is not supported.
+Operator	head	fail DocumentQueryException	Method 'First' is not supported.
+Operator	headOrDefault	n/a	
+Operator	last	fail DocumentQueryException	Method 'Last' is not supported.
+Operator	lastOrDefault	fail DocumentQueryException	Method 'LastOrDefault' is not supported.
+Operator	exactlyOne	fail DocumentQueryException	Method 'Single' is not supported.
+Operator	exactlyOneOrDefault	fail DocumentQueryException	Method 'SingleOrDefault' is not supported.
+Operator	nth	fail DocumentQueryException	Method 'ElementAt' is not supported.
+Operator	minBy	n/a	
+Operator	maxBy	n/a	
+Operator	sumBy	n/a	
+Operator	averageBy	n/a	
+Operator	minByNullable	n/a	
+Operator	maxByNullable	n/a	
+Operator	sumByNullable	n/a	
+Operator	averageByNullable	n/a	
+Key	join on a scalar	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on a tuple	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on a struct tuple	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on a record, fields in declaration order	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on a record, fields out of declaration order	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on an anonymous record, fields in alphabetical order	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on an anonymous record, fields out of alphabetical order	fail DocumentQueryException	Method 'Join' is not supported.
+Key	join on an anonymous record that one side gets from a function	fail DocumentQueryException	Method 'Join' is not supported.
+Key	groupJoin on a tuple	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	groupJoin on a record, fields out of declaration order	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	groupJoin on an anonymous record, fields out of alphabetical order	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	leftOuterJoin on a tuple	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	leftOuterJoin on a record, fields out of declaration order	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	leftOuterJoin on an anonymous record, fields out of alphabetical order	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Key	groupBy a scalar	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a scalar, groups themselves	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a tuple	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a tuple, element of the key	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a struct tuple	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a record, fields in declaration order	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy a record, fields out of declaration order	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy an anonymous record, fields in alphabetical order	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupBy an anonymous record, fields out of alphabetical order	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Key	groupValBy a tuple of values	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, sum of one of them	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, average of one of them	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, max of one of them	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, one of them selected then summed	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, counted with a predicate	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupBy after a join, key and count	fail DocumentQueryException	Method 'Join' is not supported.
+Key	groupBy after a join, sum over the joined side	fail DocumentQueryException	Method 'Join' is not supported.
+Key	Select written in the query keeps its projection	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Key	groups of groups counted against each other	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groups after a join as the result	fail DocumentQueryException	Method 'Join' is not supported.
+Key	groupValBy a tuple of values, the group compared with itself	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groups of groups, a group found among the groups it is in	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, the group as a sequence is still the group	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupBy a group, the group found among the elements it is the key of	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy records compared by reference, counted where an element is itself	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	find among the groups of a nested query	fail DocumentQueryException	Method 'First' is not supported.
+Structure	two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	two for, where over both	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for, where, for, where	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for over a navigation collection	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for over two levels of navigation collections	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	three for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for after sortBy	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for after join	fail DocumentQueryException	Method 'Join' is not supported.
+Structure	let between for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	if then around for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	for around if then	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	yield! of a navigation collection	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	distinct and take after two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	groupBy after two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	count over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	exists over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	nested query as the source	ok	SELECT VALUE root["Id"] FROM root WHERE (root["Total"] > 4)
+Structure	nested query as the source of the second for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	nested query in select	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	second for over a source filtered by a lambda	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	where with a lambda over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	where with All over another source	fail DocumentQueryException	Method 'All' is not supported.
+Structure	select with Count over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	lambda over another source capturing a let	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+Structure	lambda nested two levels deep	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	where with a method whose lambda reads nothing of the query	ok	SELECT VALUE root["Name"] FROM root WHERE (root["Age"] > 27)
+Structure	where with abs of a constant	fail DocumentQueryException	Method 'Abs$W' is not supported.
+Structure	where with a lambda that reads nothing of the query and calls abs	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	left join spelled leftOuterJoin	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Structure	left join spelled groupJoin and DefaultIfEmpty	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Structure	two left joins spelled leftOuterJoin	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Structure	two left joins spelled groupJoin and DefaultIfEmpty	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Structure	join after a left join	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+Structure	tuple selected after where	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	struct tuple selected after where	fail Exception	unreachable
+Structure	record selected after sortBy	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	anonymous record selected after join	fail DocumentQueryException	Method 'Join' is not supported.
+Structure	nested tuple selected	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	tuple of nine selected	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	tuple selected after groupBy	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+Structure	tuple selected before distinct	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	sorted nested query of records selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.String,System.Collections.Generic.IEnumerable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32...
+Structure	all over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	sumBy over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	averageBy after a join	fail DocumentQueryException	Method 'Join' is not supported.
+Structure	minByNullable over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Structure	sumByNullable after a join	fail DocumentQueryException	Method 'Join' is not supported.
+Structure	maxBy after a record select	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists after a record select	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists after a tuple select	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	count after a tuple select	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Select a tuple	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Select a struct tuple	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where over a query built earlier	n/a	
+MethodSyntax	Where over a query built earlier with a let	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select a record, fields in declaration order	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Select a record, fields out of declaration order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select an anonymous record, fields in alphabetical order	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Select an anonymous record, fields out of alphabetical order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select an anonymous record, method calls in fields out of order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select a struct anonymous record, fields out of alphabetical order	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select with a let used twice	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select with a count in a let used twice	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select with a call in a let used twice	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select with nested lets	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Select on a nullable property	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Where taking a tuple apart	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	OrderBy taking a tuple apart	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	OrderBy taking a struct tuple apart	fail ArgumentException	The tuple index '1' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	GroupBy taking a tuple apart	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	GroupBy taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	Where reading a record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	OrderBy reading a record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	GroupBy reading a record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where reading an anonymous record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	OrderBy reading an anonymous record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	GroupBy reading an anonymous record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where taking the last of nine apart	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where taking the last of a struct nine apart	fail ArgumentException	The tuple index '7' was out of range for tuple type 'System.ValueTuple`8[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Stri...
+MethodSyntax	Where over a query that selects a tuple	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where over a query that selects a record	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	Where on a nullable property	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
+MethodSyntax	Where with a lambda over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
+MethodSyntax	Select with a lambda over another source	fail DocumentQueryException	Constructor invocation is not supported.
+MethodSyntax	SelectMany with a lambda over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
+MethodSyntax	OrderBy, ThenByDescending	ok	SELECT VALUE root["Name"] FROM root ORDER BY root["City"] ASC, root["Age"] DESC
+MethodSyntax	GroupBy a tuple	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+MethodSyntax	SelectMany over a navigation collection	ok	SELECT VALUE c0["Id"] FROM root JOIN c0 IN root["Orders"]
+FSharpOperator	abs and sign in where	fail DocumentQueryException	Method 'Abs$W' is not supported.
+FSharpOperator	min and max in where	fail DocumentQueryException	Method 'Max' is not supported. Only LINQ Methods are supported.
+FSharpOperator	abs, sign, min and max in select	fail DocumentQueryException	Method 'Abs$W' is not supported.
+FSharpOperator	floor and ceil in where	fail DocumentQueryException	Method 'Floor$W' is not supported.
+FSharpOperator	round and truncate in where	fail DocumentQueryException	Method 'Round$W' is not supported.
+FSharpOperator	sqrt and ** in where	fail DocumentQueryException	Method 'Sqrt$W' is not supported.
+FSharpOperator	exp, log and log10 in where	fail DocumentQueryException	Method 'Exp$W' is not supported.
+FSharpOperator	sin, cos and tan in where	fail DocumentQueryException	Method 'Sin$W' is not supported.
+FSharpOperator	asin, acos, atan and atan2 in where	fail DocumentQueryException	Method 'Asin$W' is not supported.
+FSharpOperator	sinh, cosh and tanh in where	fail DocumentQueryException	Method 'Sinh$W' is not supported.
+FSharpOperator	sqrt, floor, ceil and truncate in select	fail DocumentQueryException	Method 'Sqrt$W' is not supported.
+FSharpOperator	sqrt of a float32 in where	fail DocumentQueryException	Method 'Sqrt$W' is not supported.
+FSharpOperator	fst and snd after select into	fail DocumentQueryException	Method 'Fst' is not supported.
+FSharpOperator	fst and snd of a let-bound tuple	fail DocumentQueryException	Method 'Fst' is not supported.
+FSharpOperator	isNull in where	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+FSharpOperator	isNull of a boxed nullable in select	fail DocumentQueryException	Method 'IsNull' is not supported.
+FSharpOperator	box compared with null in where	fail DocumentQueryException	Method 'GroupJoin' is not supported.
+FSharpOperator	boxed nullable compared with null in where	fail DocumentQueryException	Method 'Box' is not supported.
+FSharpOperator	not in where	ok	SELECT VALUE root["Name"] FROM root WHERE (NOT (root["Age"] > 28))
+FSharpOperator	Where with abs and max	fail DocumentQueryException	Method 'Abs$W' is not supported.
+FSharpOperator	Where with sqrt and sin	fail DocumentQueryException	Method 'Sqrt$W' is not supported.
+FSharpOperator	Select with floor and sign	fail DocumentQueryException	Constructor invocation is not supported.
+FSharpOperator	GroupBy a tuple, fst of the key	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
+FSharpOperator	Where with isNull	fail DocumentQueryException	Method 'IsNull' is not supported.
+FSharpOperator	Where with box compared with null	fail DocumentQueryException	Method 'Box' is not supported.

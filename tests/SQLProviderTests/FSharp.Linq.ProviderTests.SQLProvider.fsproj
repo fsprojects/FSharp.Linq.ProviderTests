@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Queries written the way SQLProvider users write them, run against db/shop.db.
+    Run with: dotnet test tests/SQLProviderTests/FSharp.Linq.ProviderTests.SQLProvider.fsproj -c Release
+
+    While it compiles, SQLProvider reads the tables from db/shop.schema, not from the database, so that compiling
+    needs neither the database nor the native SQLite library. After a change of db/shop.sql or of the queries, delete
+    db/shop.schema and run dotnet build -p:SaveSchema=true to write it again.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Scenarios/FSharp.Linq.ProviderTests.Scenarios.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3.mtp-off" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+
+    <PackageReference Include="SQLProvider.SQLite" Version="1.5.28" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Database.fs" />
+    <Compile Include="Queries.fs" />
+    <Compile Include="Tests.fs" />
+    <Compile Include="SaveSchema.fs" Condition="'$(SaveSchema)' == 'true'" />
+  </ItemGroup>
+
+</Project>

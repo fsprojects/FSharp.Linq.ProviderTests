@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The scenarios against EF Core (SQLite, SQL Server, PostgreSQL), Cosmos DB and linq2db.
+    Run with: dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release
+  -->
+
+  <PropertyGroup>
+    <!-- xUnit v3 test projects are executables -->
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Scenarios/FSharp.Linq.ProviderTests.Scenarios.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      VSTest only. dotnet/fsharp builds this repository with a global.json that has no test runner section, so
+      dotnet test is VSTest there; the mtp-off flavor of xUnit v3 does not bring the Microsoft Testing Platform.
+    -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3.mtp-off" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.63.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="linq2db" Version="6.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Shop.fs" />
+    <Compile Include="EfCore.fs" />
+    <Compile Include="Cosmos.fs" />
+    <Compile Include="CosmosEmulator.fs" />
+    <Compile Include="Linq2Db.fs" />
+    <Compile Include="Tests.fs" />
+  </ItemGroup>
+
+</Project>

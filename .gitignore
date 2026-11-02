@@ -1,0 +1,12 @@
+bin/
+obj/
+artifacts/
+.vs/
+.idea/
+*.user
+*.suo
+TestResults/
+*.binlog
+
+# The scenarios are copied from dotnet/fsharp: keep scratch copies out of the way
+/scratch/

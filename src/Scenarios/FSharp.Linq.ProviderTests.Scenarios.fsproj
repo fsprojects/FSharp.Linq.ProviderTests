@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The query scenarios, copied from dotnet/fsharp by scripts/sync-scenarios.ps1 (see SOURCE.txt), and what every
+    provider project needs to run them: the list of sections, a runner and the baselines.
+    Nothing here depends on a provider package.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <!-- The scenarios use the F# of the SDK; there is no language version to pin -->
+    <WarningLevel>3</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same order as in dotnet/fsharp -->
+    <Compile Include="QueryProviderShape.fs" />
+    <Compile Include="QueryScenarioDomain.fs" />
+    <Compile Include="QueryScenario.fs" />
+    <Compile Include="QueryProjectionScenarios.fs" />
+    <Compile Include="QueryOperatorScenarios.fs" />
+    <Compile Include="QueryKeyScenarios.fs" />
+    <Compile Include="QueryStructureScenarios.fs" />
+    <Compile Include="QueryMethodSyntaxScenarios.fs" />
+    <Compile Include="QueryFSharpOperatorScenarios.fs" />
+    <Compile Include="AllScenarios.fs" />
+    <Compile Include="Baseline.fs" />
+    <Compile Include="Runner.fs" />
+  </ItemGroup>
+
+</Project>
