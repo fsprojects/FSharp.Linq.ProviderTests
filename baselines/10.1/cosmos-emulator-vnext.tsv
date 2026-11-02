@@ -15,6 +15,7 @@ Projection	struct tuple of nine	fail Exception	unreachable
 Projection	struct tuple inside a tuple	fail Exception	unreachable
 Projection	tuple inside a struct tuple	fail Exception	unreachable
 Projection	tuple taken apart by the next for	fail DocumentQueryException	Constructor invocation is not supported.
+Projection	distinct of an item of a tuple taken apart by the next for	fail DocumentQueryException	Constructor invocation is not supported.
 Projection	struct tuple taken apart by the next for	fail Exception	unreachable
 Projection	tuple of nine taken apart by the next for	fail DocumentQueryException	Constructor invocation is not supported.
 Projection	record read by the next for	fail DocumentQueryException	Constructor invocation is not supported.
@@ -113,6 +114,16 @@ Key	groups of groups, a group found among the groups it is in	fail ArgumentExcep
 Key	groupValBy a tuple of values, the group as a sequence is still the group	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
 Key	groupBy a group, the group found among the elements it is the key of	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
 Key	groupValBy records compared by reference, counted where an element is itself	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a record, a tuple in it compared with itself	fail DocumentQueryException	Expression with NodeType 'New' is not supported.
+Key	groupValBy a tuple, a record in it compared with itself	fail ArgumentException	Property 'Int32 Id' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values, the group beside its count	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a tuple of values after a join, the group beside its count	fail DocumentQueryException	Method 'Join' is not supported.
+Key	groupValBy a tuple of values after two for, the group beside its count	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
+Key	groupValBy a record, the group beside its count	fail ArgumentException	Property 'System.String Name' is not defined for type 'System.String' (Parameter 'property')
+Key	find in a nested query over two for	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Tuple`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core.UnitTests.Linq.Order]', but received type 'Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core...
+Key	groupValBy a record, a member of it that gives the record itself	fail ArgumentException	Property 'Int32 Id' is not defined for type 'System.String' (Parameter 'property')
+Key	groupValBy a record, a struct in it with a tuple in it compared with itself	fail DocumentQueryException	Expression with NodeType 'New' is not supported.
+Key	groupValBy a tuple, a tuple in it compared with itself	fail ArgumentException	Property 'Int32 Id' is not defined for type 'System.String' (Parameter 'property')
 Key	find among the groups of a nested query	fail DocumentQueryException	Method 'First' is not supported.
 Structure	two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
 Structure	two for, where over both	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
@@ -137,6 +148,7 @@ Structure	second for over a source filtered by a lambda	fail DocumentQueryExcept
 Structure	where with a lambda over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
 Structure	where with All over another source	fail DocumentQueryException	Method 'All' is not supported.
 Structure	select with Count over another source	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	select of another source projected without reading the element	fail DocumentQueryException	Input is not of type IDocumentQuery.
 Structure	lambda over another source capturing a let	fail DocumentQueryException	Expression with NodeType 'Block' is not supported.
 Structure	lambda nested two levels deep	fail DocumentQueryException	Input is not of type IDocumentQuery.
 Structure	where with a method whose lambda reads nothing of the query	ok	SELECT VALUE root["Name"] FROM root WHERE (root["Age"] > 27)
@@ -156,6 +168,8 @@ Structure	tuple of nine selected	fail DocumentQueryException	Constructor invocat
 Structure	tuple selected after groupBy	fail DocumentQueryException	Incorrect number of arguments for method 'GroupBy'. Expected '3' but received '2'.
 Structure	tuple selected before distinct	fail DocumentQueryException	Constructor invocation is not supported.
 Structure	sorted nested query of records selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.String,System.Collections.Generic.IEnumerable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32...
+Structure	sorted nested query over a sequence selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
+Structure	sorted nested query over a sequence selected in a tuple, then take	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
 Structure	all over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
 Structure	sumBy over two for	fail DocumentQueryException	Incorrect number of arguments for method 'SelectMany'. Expected '2' but received '3'.
 Structure	averageBy after a join	fail DocumentQueryException	Method 'Join' is not supported.
@@ -163,6 +177,13 @@ Structure	minByNullable over two for	fail DocumentQueryException	Incorrect numbe
 Structure	sumByNullable after a join	fail DocumentQueryException	Method 'Join' is not supported.
 Structure	maxBy after a record select	fail DocumentQueryException	Constructor invocation is not supported.
 Structure	exists after a record select	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists after a record select, the record compared with itself	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists after a record select, a member of the record that gives the record itself	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists after a record select, a struct in it with a tuple in it compared with itself	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	sumBy after a struct select, a record in it changed through the struct passed twice	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	exists with a nested query, the nested query compared with itself	fail DocumentQueryException	Input is not of type IDocumentQuery.
+Structure	all after a tuple select, the tuple compared with itself	fail DocumentQueryException	Constructor invocation is not supported.
+Structure	sumBy after a tuple select, a tuple in it compared with itself	fail DocumentQueryException	Constructor invocation is not supported.
 Structure	exists after a tuple select	fail DocumentQueryException	Constructor invocation is not supported.
 Structure	count after a tuple select	fail DocumentQueryException	Constructor invocation is not supported.
 MethodSyntax	Select a tuple	fail DocumentQueryException	Constructor invocation is not supported.
