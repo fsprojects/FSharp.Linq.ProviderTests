@@ -182,6 +182,8 @@ Structure	exists after a record select, a member of the record that gives the re
 Structure	exists after a record select, a struct in it with a tuple in it compared with itself	fail LinqToDBException	The LINQ expression 'object.ReferenceEquals(QueryStructureScenarios.pairOf(p.Wrapped), QueryStructureScenarios.pairOf(p.Wrapped))' could not be converted to SQL.
 Structure	sumBy after a struct select, a record in it changed through the struct passed twice	fail LinqToDBException	The LINQ expression could not be converted to SQL. Expression: QueryStructureScenarios.changeThenRead( x: x, y: x)
 Structure	exists with a nested query, the nested query compared with itself	fail LinqToDBException	The LINQ expression 'object.ReferenceEquals(tupledArg.Item2, tupledArg.Item2)' could not be converted to SQL.
+Structure	exists with a nested query of groups, the nested query compared with itself	fail LinqToDBException	The LINQ expression 'object.ReferenceEquals(tupledArg.Item2, tupledArg.Item2)' could not be converted to SQL.
+Structure	exists with a nested query of struct tuples, the nested query compared with itself	fail Exception	unreachable
 Structure	all after a tuple select, the tuple compared with itself	fail LinqToDBException	The LINQ expression '!(object.ReferenceEquals(t, t))' could not be converted to SQL.
 Structure	sumBy after a tuple select, a tuple in it compared with itself	fail LinqToDBException	The LINQ expression 'object.ReferenceEquals(x.Item2, x.Item2) ? 1 : 0' could not be converted to SQL.
 Structure	exists after a tuple select	fail LinqToDBException	The LINQ expression 'city == /* Operators.op_Equality(...) */ "Paris"' could not be converted to SQL.
