@@ -6,7 +6,7 @@ providers:
 | Provider | What the tests do |
 |---|---|
 | EF Core on SQLite | run every scenario against an in-memory database and compare the rows, also with `ToListAsync` |
-| EF Core on SQL Server and on PostgreSQL | ask for the SQL of every scenario; there is no server |
+| EF Core on SQL Server and on PostgreSQL | ask for the SQL of every scenario without a server, and run every scenario on a server in a container when one is there |
 | Azure Cosmos DB | ask for the SQL of every scenario without a server, and run every scenario on the Azure Cosmos DB Emulator when one is there |
 | linq2db on SQLite | run every scenario and compare the rows |
 | SQLProvider on SQLite | run about sixty queries in the style of SQLProvider users against `db/shop.db` and compare the rows |
@@ -80,6 +80,25 @@ afterwards. Both emulators work and answer a little differently, so each has its
 | `COSMOS_EMULATOR_REQUIRED` | `1` makes a missing emulator an error; without it the test is skipped. The Linux job of CI sets it |
 
 The vNext emulator runs in Docker: `.github/scripts/start-cosmos-emulator.ps1`.
+
+## Servers in containers
+
+The tests of the module `ServerTests` run the scenarios on a server, in a database that they create and delete
+afterwards, and compare the rows. Each test is skipped when its server does not answer. The job `servers` of CI starts
+the servers as service containers and makes a missing one an error. The defaults are the addresses of these
+containers, with throwaway passwords:
+
+```
+docker run -d -p 1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=FSharp-Linq-1 mcr.microsoft.com/mssql/server:2022-latest
+docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=fsharp-linq postgres:17
+```
+
+| Provider | Address | Variable that makes a missing server an error | Baseline |
+|---|---|---|---|
+| EF Core on SQL Server | `SQLSERVER_CONNECTION_STRING`, `Server=127.0.0.1,1433;User Id=sa;Password=FSharp-Linq-1;...` by default | `SQLSERVER_REQUIRED=1` | `efcore-sqlserver-live.tsv` |
+| EF Core on PostgreSQL | `POSTGRESQL_CONNECTION_STRING`, `Host=127.0.0.1;Port=5432;Username=postgres;Password=fsharp-linq;...` by default | `POSTGRESQL_REQUIRED=1` | `efcore-postgresql-live.tsv` |
+
+To run only these tests: `dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release --filter "FullyQualifiedName~ServerTests"`.
 
 ## SQLProvider
 

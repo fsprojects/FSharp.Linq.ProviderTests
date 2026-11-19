@@ -14,6 +14,16 @@ module Verify =
 
         Assert.True(verdict.Passed, verdict.Report)
 
+    /// Checks a provider on a server when the server answers. Skips the test when it does not, or fails it when the
+    /// server has to be there.
+    let onServer (server: Server) (probe: unit -> Result<unit, string>) (name: string) (run: unit -> Observation list) =
+        match probe () with
+        | Error reason when Server.isRequired server ->
+            failwith
+                $"No {server.Name} answers at {Server.describe server} ({reason}), and {server.RequiredVariable} says that one has to."
+        | Error reason -> Assert.Skip $"No {server.Name} answers at {Server.describe server}: {reason}"
+        | Ok() -> provider name false (run ())
+
 module EfCoreTests =
 
     [<Fact>]
@@ -33,6 +43,19 @@ module EfCoreTests =
     [<Fact>]
     let ``EF Core PostgreSQL`` () =
         Verify.provider "efcore-postgresql" false (Runner.run (EfCore.sqlOnly EfCore.postgreSqlOptions))
+
+/// The tests that need a server in a container. CI runs them in a job of their own, which starts the servers.
+module ServerTests =
+
+    [<Fact>]
+    let ``EF Core SQL Server on a server`` () =
+        Verify.onServer EfCoreServer.sqlServer EfCoreServer.probeSqlServer "efcore-sqlserver-live" (fun () ->
+            EfCoreServer.run EfCoreServer.sqlServerOptions)
+
+    [<Fact>]
+    let ``EF Core PostgreSQL on a server`` () =
+        Verify.onServer EfCoreServer.postgreSql EfCoreServer.probePostgreSql "efcore-postgresql-live" (fun () ->
+            EfCoreServer.run EfCoreServer.postgreSqlOptions)
 
 module Linq2DbTests =
 

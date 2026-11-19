@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Shop.fs" />
     <Compile Include="EfCore.fs" />
+    <Compile Include="Server.fs" />
     <Compile Include="Cosmos.fs" />
     <Compile Include="CosmosEmulator.fs" />
     <Compile Include="Linq2Db.fs" />
