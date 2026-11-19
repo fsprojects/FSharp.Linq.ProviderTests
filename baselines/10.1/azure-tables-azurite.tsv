@@ -1,0 +1,253 @@
+# FSharp.Core 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
+# build 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
+# provider azure-tables-azurite
+Projection	scalar	ok	
+Projection	entity	ok	
+Projection	computed scalars	n/a	
+Projection	let in select	ok	
+Projection	tuple of two	n/a	
+Projection	tuple of seven	n/a	
+Projection	tuple of eight	n/a	
+Projection	tuple of nine	n/a	
+Projection	nested tuple	n/a	
+Projection	struct tuple of two	fail Exception	unreachable
+Projection	struct tuple of nine	fail Exception	unreachable
+Projection	struct tuple inside a tuple	fail Exception	unreachable
+Projection	tuple inside a struct tuple	fail Exception	unreachable
+Projection	tuple taken apart by the next for	n/a	
+Projection	distinct of an item of a tuple taken apart by the next for	n/a	
+Projection	struct tuple taken apart by the next for	fail Exception	unreachable
+Projection	tuple of nine taken apart by the next for	n/a	
+Projection	record read by the next for	n/a	
+Projection	anonymous record read by the next for	n/a	
+Projection	record, fields in declaration order	n/a	
+Projection	record, fields out of declaration order	ok	
+Projection	record, fields out of declaration order, read by the next where	n/a	
+Projection	record of three, fields rotated	ok	
+Projection	record holding a tuple	n/a	
+Projection	anonymous record, fields in alphabetical order	n/a	
+Projection	anonymous record, fields out of alphabetical order	ok	
+Projection	anonymous record, fields out of alphabetical order, read by the next where	n/a	
+Projection	anonymous record, method calls in fields out of order	ok	
+Projection	anonymous record inside an anonymous record	n/a	
+Projection	struct anonymous record, fields in alphabetical order	n/a	
+Projection	struct anonymous record, fields out of alphabetical order	ok	
+Projection	CLIMutable record, fields in declaration order	ok	
+Projection	CLIMutable record, fields out of declaration order	ok	
+Projection	class with property initializers	ok	
+Projection	option	ok	
+Operator	where	ok	Age gt 26
+Operator	where with string methods	fail NotSupportedException	Method StartsWith not supported.
+Operator	where on a nullable property	wrong	Registered/HasValue eq true and Registered/Year gt 2020
+Operator	where with a nullable operator	ok	Discount gt 1
+Operator	where with a let	fail NotSupportedException	The expression {var age; ... } is not supported.
+Operator	if then	ok	Age gt 26
+Operator	sortBy, thenByDescending	n/a	
+Operator	sortByDescending, thenBy	n/a	
+Operator	sortByNullable, thenByNullableDescending	n/a	
+Operator	sortByNullableDescending, thenByNullable	n/a	
+Operator	distinct	n/a	
+Operator	skip, take	n/a	
+Operator	skipWhile, takeWhile	n/a	
+Operator	join	n/a	
+Operator	groupJoin	n/a	
+Operator	leftOuterJoin	n/a	
+Operator	leftOuterJoin tested with isNull	n/a	
+Operator	count	n/a	
+Operator	exists	n/a	
+Operator	exists on a nullable property	n/a	
+Operator	exists with a let	n/a	
+Operator	all	n/a	
+Operator	contains	n/a	
+Operator	find	n/a	
+Operator	head	n/a	
+Operator	headOrDefault	n/a	
+Operator	last	n/a	
+Operator	lastOrDefault	n/a	
+Operator	exactlyOne	n/a	
+Operator	exactlyOneOrDefault	n/a	
+Operator	nth	n/a	
+Operator	minBy	n/a	
+Operator	maxBy	n/a	
+Operator	sumBy	n/a	
+Operator	averageBy	n/a	
+Operator	minByNullable	n/a	
+Operator	maxByNullable	n/a	
+Operator	sumByNullable	n/a	
+Operator	averageByNullable	n/a	
+Key	join on a scalar	n/a	
+Key	join on a tuple	n/a	
+Key	join on a struct tuple	n/a	
+Key	join on a record, fields in declaration order	n/a	
+Key	join on a record, fields out of declaration order	n/a	
+Key	join on an anonymous record, fields in alphabetical order	n/a	
+Key	join on an anonymous record, fields out of alphabetical order	n/a	
+Key	join on an anonymous record that one side gets from a function	n/a	
+Key	groupJoin on a tuple	n/a	
+Key	groupJoin on a record, fields out of declaration order	n/a	
+Key	groupJoin on an anonymous record, fields out of alphabetical order	n/a	
+Key	leftOuterJoin on a tuple	n/a	
+Key	leftOuterJoin on a record, fields out of declaration order	n/a	
+Key	leftOuterJoin on an anonymous record, fields out of alphabetical order	n/a	
+Key	groupBy a scalar	n/a	
+Key	groupBy a scalar, groups themselves	n/a	
+Key	groupBy a tuple	n/a	
+Key	groupBy a tuple, element of the key	n/a	
+Key	groupBy a struct tuple	n/a	
+Key	groupBy a record, fields in declaration order	n/a	
+Key	groupBy a record, fields out of declaration order	n/a	
+Key	groupBy an anonymous record, fields in alphabetical order	n/a	
+Key	groupBy an anonymous record, fields out of alphabetical order	n/a	
+Key	groupValBy a tuple of values	n/a	
+Key	groupValBy a tuple of values, sum of one of them	n/a	
+Key	groupValBy a tuple of values, average of one of them	n/a	
+Key	groupValBy a tuple of values, max of one of them	n/a	
+Key	groupValBy a tuple of values, one of them selected then summed	n/a	
+Key	groupValBy a tuple of values, counted with a predicate	n/a	
+Key	groupBy after a join, key and count	n/a	
+Key	groupBy after a join, sum over the joined side	n/a	
+Key	Select written in the query keeps its projection	n/a	
+Key	groups of groups counted against each other	n/a	
+Key	groups after a join as the result	n/a	
+Key	groupValBy a tuple of values, the group compared with itself	n/a	
+Key	groups of groups, a group found among the groups it is in	n/a	
+Key	groupValBy a tuple of values, the group as a sequence is still the group	n/a	
+Key	groupBy a group, the group found among the elements it is the key of	n/a	
+Key	groupValBy records compared by reference, counted where an element is itself	n/a	
+Key	groupValBy a record, a tuple in it compared with itself	n/a	
+Key	groupValBy a tuple, a record in it compared with itself	n/a	
+Key	groupValBy a tuple of values, the group beside its count	n/a	
+Key	groupValBy a tuple of values after a join, the group beside its count	n/a	
+Key	groupValBy a tuple of values after two for, the group beside its count	n/a	
+Key	groupValBy a record, the group beside its count	n/a	
+Key	find in a nested query over two for	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Tuple`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core.UnitTests.Linq.Order]', but received type 'Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core...
+Key	groupValBy a record, a member of it that gives the record itself	n/a	
+Key	groupValBy a record, a struct in it with a tuple in it compared with itself	n/a	
+Key	groupValBy a tuple, a tuple in it compared with itself	n/a	
+Key	find among the groups of a nested query	n/a	
+Structure	two for	n/a	
+Structure	two for, where over both	n/a	
+Structure	for, where, for, where	n/a	
+Structure	for over a navigation collection	n/a	
+Structure	for over two levels of navigation collections	n/a	
+Structure	three for	n/a	
+Structure	for after sortBy	n/a	
+Structure	for after join	n/a	
+Structure	let between for	n/a	
+Structure	if then around for	n/a	
+Structure	for around if then	n/a	
+Structure	yield! of a navigation collection	n/a	
+Structure	distinct and take after two for	n/a	
+Structure	groupBy after two for	n/a	
+Structure	count over two for	n/a	
+Structure	exists over two for	n/a	
+Structure	nested query as the source	ok	Total gt 4.0
+Structure	nested query as the source of the second for	n/a	
+Structure	nested query in select	n/a	
+Structure	second for over a source filtered by a lambda	n/a	
+Structure	where with a lambda over another source	fail NotSupportedException	Method SubstHelper not supported.
+Structure	where with All over another source	fail NotSupportedException	Method SubstHelper not supported.
+Structure	select with Count over another source	n/a	
+Structure	select of another source projected without reading the element	ok	
+Structure	lambda over another source capturing a let	fail NotSupportedException	Method SubstHelper not supported.
+Structure	lambda nested two levels deep	fail NotSupportedException	Method SubstHelper not supported.
+Structure	where with a method whose lambda reads nothing of the query	ok	Age gt 27
+Structure	where with abs of a constant	fail NotSupportedException	Method Abs not supported.
+Structure	where with a lambda that reads nothing of the query and calls abs	n/a	
+Structure	left join spelled leftOuterJoin	n/a	
+Structure	left join spelled groupJoin and DefaultIfEmpty	n/a	
+Structure	two left joins spelled leftOuterJoin	n/a	
+Structure	two left joins spelled groupJoin and DefaultIfEmpty	n/a	
+Structure	join after a left join	n/a	
+Structure	tuple selected after where	n/a	
+Structure	struct tuple selected after where	fail Exception	unreachable
+Structure	record selected after sortBy	n/a	
+Structure	anonymous record selected after join	n/a	
+Structure	nested tuple selected	n/a	
+Structure	tuple of nine selected	n/a	
+Structure	tuple selected after groupBy	n/a	
+Structure	tuple selected before distinct	n/a	
+Structure	sorted nested query of records selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.String,System.Collections.Generic.IEnumerable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32...
+Structure	sorted nested query over a sequence selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
+Structure	sorted nested query over a sequence selected in a tuple, then take	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
+Structure	all over two for	n/a	
+Structure	sumBy over two for	n/a	
+Structure	averageBy after a join	n/a	
+Structure	minByNullable over two for	n/a	
+Structure	sumByNullable after a join	n/a	
+Structure	maxBy after a record select	n/a	
+Structure	exists after a record select	n/a	
+Structure	exists after a record select, the record compared with itself	n/a	
+Structure	exists after a record select, a member of the record that gives the record itself	n/a	
+Structure	exists after a record select, a struct in it with a tuple in it compared with itself	n/a	
+Structure	sumBy after a struct select, a record in it changed through the struct passed twice	n/a	
+Structure	exists with a nested query, the nested query compared with itself	n/a	
+Structure	exists with a nested query of groups, the nested query compared with itself	n/a	
+Structure	exists with a nested query of struct tuples, the nested query compared with itself	fail Exception	unreachable
+Structure	all after a tuple select, the tuple compared with itself	n/a	
+Structure	sumBy after a tuple select, a tuple in it compared with itself	n/a	
+Structure	exists after a tuple select	n/a	
+Structure	count after a tuple select	n/a	
+MethodSyntax	Select a tuple	ok	
+MethodSyntax	Select a struct tuple	ok	
+MethodSyntax	Where over a query built earlier	fail NotSupportedException	Method Contains not supported.
+MethodSyntax	Where over a query built earlier with a let	fail NotSupportedException	Method Contains not supported.
+MethodSyntax	Select a record, fields in declaration order	ok	
+MethodSyntax	Select a record, fields out of declaration order	ok	
+MethodSyntax	Select an anonymous record, fields in alphabetical order	ok	
+MethodSyntax	Select an anonymous record, fields out of alphabetical order	ok	
+MethodSyntax	Select an anonymous record, method calls in fields out of order	ok	
+MethodSyntax	Select a struct anonymous record, fields out of alphabetical order	ok	
+MethodSyntax	Select with a let used twice	ok	
+MethodSyntax	Select with a count in a let used twice	n/a	
+MethodSyntax	Select with a call in a let used twice	n/a	
+MethodSyntax	Select with nested lets	ok	
+MethodSyntax	Select on a nullable property	ok	
+MethodSyntax	Where taking a tuple apart	n/a	
+MethodSyntax	Where taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	OrderBy taking a tuple apart	n/a	
+MethodSyntax	OrderBy taking a struct tuple apart	fail ArgumentException	The tuple index '1' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	GroupBy taking a tuple apart	n/a	
+MethodSyntax	GroupBy taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	Where reading a record	n/a	
+MethodSyntax	OrderBy reading a record	n/a	
+MethodSyntax	GroupBy reading a record	n/a	
+MethodSyntax	Where reading an anonymous record	n/a	
+MethodSyntax	OrderBy reading an anonymous record	n/a	
+MethodSyntax	GroupBy reading an anonymous record	n/a	
+MethodSyntax	Where taking the last of nine apart	n/a	
+MethodSyntax	Where taking the last of a struct nine apart	fail ArgumentException	The tuple index '7' was out of range for tuple type 'System.ValueTuple`8[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Stri...
+MethodSyntax	Where over a query that selects a tuple	n/a	
+MethodSyntax	Where over a query that selects a record	n/a	
+MethodSyntax	Where on a nullable property	fail NotSupportedException	The expression ({var copyOfStruct; ... } AndAlso ({var copyOfStruct; ... } > 2020)) is not supported.
+MethodSyntax	Where with a lambda over another source	fail NotSupportedException	Method SubstHelper not supported.
+MethodSyntax	Select with a lambda over another source	n/a	
+MethodSyntax	SelectMany with a lambda over another source	n/a	
+MethodSyntax	OrderBy, ThenByDescending	n/a	
+MethodSyntax	GroupBy a tuple	n/a	
+MethodSyntax	SelectMany over a navigation collection	n/a	
+FSharpOperator	abs and sign in where	fail NotSupportedException	Method Abs not supported.
+FSharpOperator	min and max in where	fail NotSupportedException	Method Max not supported.
+FSharpOperator	abs, sign, min and max in select	n/a	
+FSharpOperator	floor and ceil in where	fail NotSupportedException	Method Floor not supported.
+FSharpOperator	round and truncate in where	fail NotSupportedException	Method Round not supported.
+FSharpOperator	sqrt and ** in where	fail NotSupportedException	Method Sqrt not supported.
+FSharpOperator	exp, log and log10 in where	fail NotSupportedException	Method Exp not supported.
+FSharpOperator	sin, cos and tan in where	fail NotSupportedException	Method Sin not supported.
+FSharpOperator	asin, acos, atan and atan2 in where	n/a	
+FSharpOperator	sinh, cosh and tanh in where	fail NotSupportedException	Method Sinh not supported.
+FSharpOperator	sqrt, floor, ceil and truncate in select	n/a	
+FSharpOperator	sqrt of a float32 in where	fail NotSupportedException	Method Sqrt not supported.
+FSharpOperator	fst and snd after select into	n/a	
+FSharpOperator	fst and snd of a let-bound tuple	n/a	
+FSharpOperator	isNull in where	n/a	
+FSharpOperator	isNull of a boxed nullable in select	n/a	
+FSharpOperator	box compared with null in where	n/a	
+FSharpOperator	boxed nullable compared with null in where	fail NotSupportedException	Method Box not supported.
+FSharpOperator	not in where	ok	not (Age gt 28)
+FSharpOperator	Where with abs and max	fail NotSupportedException	Method Abs not supported.
+FSharpOperator	Where with sqrt and sin	fail NotSupportedException	Method Sqrt not supported.
+FSharpOperator	Select with floor and sign	ok	
+FSharpOperator	GroupBy a tuple, fst of the key	n/a	
+FSharpOperator	Where with isNull	fail NotSupportedException	Method IsNull not supported.
+FSharpOperator	Where with box compared with null	fail NotSupportedException	Method Box not supported.

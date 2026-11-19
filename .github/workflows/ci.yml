@@ -97,6 +97,12 @@ jobs:
           --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -pfsharp-linq"
           --health-interval 5s --health-timeout 5s --health-retries 30
 
+      # Azurite answers within a second or two of starting; the steps before the tests take longer
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite
+        ports:
+          - 10002:10002
+
     steps:
       - uses: actions/checkout@v6
 
@@ -116,6 +122,7 @@ jobs:
           MONGODB_REQUIRED: '1'
           MYSQL_REQUIRED: '1'
           MARTEN_REQUIRED: '1'
+          AZURITE_REQUIRED: '1'
 
       - name: Upload what the providers did
         if: always()

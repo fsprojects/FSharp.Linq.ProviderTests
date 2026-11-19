@@ -84,6 +84,16 @@ module ServerTests =
     let ``Marten on a server`` () =
         Verify.onServer Marten.server Marten.probe "marten-live" Marten.run
 
+    [<Fact>]
+    let ``Azure Table Storage on Azurite`` () =
+        Verify.onServer Tables.server Tables.probe "azure-tables-azurite" Tables.run
+
+module TablesTests =
+
+    [<Fact>]
+    let ``Azure Table Storage without a server`` () =
+        Verify.provider "azure-tables-offline" false (Runner.run Tables.offline)
+
 module MongoTests =
 
     [<Fact>]
