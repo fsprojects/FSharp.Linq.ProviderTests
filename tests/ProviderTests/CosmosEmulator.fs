@@ -58,8 +58,9 @@ type Kind =
         | Kind.Windows -> "cosmos-emulator-windows"
         | Kind.VNext -> "cosmos-emulator-vnext"
 
-// The emulator serves a certificate that it signed itself; it is accepted from this machine only
-let private createHandler () =
+/// A handler for requests to the emulator. The emulator serves a certificate that it signed itself; it is accepted
+/// from this machine only.
+let createHandler () =
     new HttpClientHandler(
         ServerCertificateCustomValidationCallback =
             (fun request _ _ errors ->

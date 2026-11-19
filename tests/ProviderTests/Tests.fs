@@ -78,3 +78,16 @@ module CosmosTests =
                 $"No Cosmos DB Emulator answers at {CosmosEmulator.endpoint}, and {CosmosEmulator.RequiredVariable} says that one has to."
         | ValueNone -> Assert.Skip $"No Cosmos DB Emulator answers at {CosmosEmulator.endpoint}."
         | ValueSome kind -> Verify.provider kind.Provider true (CosmosEmulator.run ())
+
+    [<Fact>]
+    let ``EF Core Cosmos without a server`` () =
+        Verify.provider "efcore-cosmos-offline" false (Runner.run EfCoreCosmos.offline)
+
+    [<Fact>]
+    let ``EF Core Cosmos emulator`` () =
+        match CosmosEmulator.probe () with
+        | ValueNone when CosmosEmulator.isRequired () ->
+            failwith
+                $"No Cosmos DB Emulator answers at {CosmosEmulator.endpoint}, and {CosmosEmulator.RequiredVariable} says that one has to."
+        | ValueNone -> Assert.Skip $"No Cosmos DB Emulator answers at {CosmosEmulator.endpoint}."
+        | ValueSome kind -> Verify.provider $"efcore-{kind.Provider}" true (EfCoreCosmos.run ())

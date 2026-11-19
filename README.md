@@ -8,6 +8,7 @@ providers:
 | EF Core on SQLite | run every scenario against an in-memory database and compare the rows, also with `ToListAsync` |
 | EF Core on SQL Server and on PostgreSQL | ask for the SQL of every scenario without a server, and run every scenario on a server in a container when one is there |
 | Azure Cosmos DB | ask for the SQL of every scenario without a server, and run every scenario on the Azure Cosmos DB Emulator when one is there |
+| EF Core on Azure Cosmos DB | the same with the Cosmos provider of EF Core, which translates the queries itself |
 | linq2db on SQLite | run every scenario and compare the rows |
 | SQLProvider on SQLite | run about sixty queries in the style of SQLProvider users against `db/shop.db` and compare the rows |
 
@@ -80,6 +81,11 @@ afterwards. Both emulators work and answer a little differently, so each has its
 | `COSMOS_EMULATOR_REQUIRED` | `1` makes a missing emulator an error; without it the test is skipped. The Linux job of CI sets it |
 
 The vNext emulator runs in Docker: `.github/scripts/start-cosmos-emulator.ps1`.
+
+The test `EF Core Cosmos emulator` does the same with the Cosmos provider of EF Core, with the same variables, and
+writes `efcore-cosmos-emulator-windows.tsv` or `efcore-cosmos-emulator-vnext.tsv`. It passes while there is no
+baseline yet; the first run with an emulator gives one. The provider refuses synchronous queries unless its warning
+`CosmosEventId.SyncNotSupported` is turned off, and the tests turn it off: a query expression enumerates its rows.
 
 ## Servers in containers
 
