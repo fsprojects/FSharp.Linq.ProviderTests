@@ -6,7 +6,7 @@ providers:
 | Provider | What the tests do |
 |---|---|
 | EF Core on SQLite | run every scenario against an in-memory database and compare the rows, also with `ToListAsync` |
-| EF Core on SQL Server and on PostgreSQL | ask for the SQL of every scenario without a server, and run every scenario on a server in a container when one is there |
+| EF Core on SQL Server, on PostgreSQL and on MySQL (Oracle's provider) | ask for the SQL of every scenario without a server, and run every scenario on a server in a container when one is there |
 | Azure Cosmos DB | ask for the SQL of every scenario without a server, and run every scenario on the Azure Cosmos DB Emulator when one is there |
 | EF Core on Azure Cosmos DB | the same with the Cosmos provider of EF Core, which translates the queries itself |
 | linq2db on SQLite | run every scenario and compare the rows |
@@ -99,12 +99,14 @@ containers, with throwaway passwords:
 docker run -d -p 1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=FSharp-Linq-1 mcr.microsoft.com/mssql/server:2022-latest
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=fsharp-linq postgres:17
 docker run -d -p 27017:27017 mongo:8
+docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=fsharp-linq mysql:8.4
 ```
 
 | Provider | Address | Variable that makes a missing server an error | Baseline |
 |---|---|---|---|
 | EF Core on SQL Server | `SQLSERVER_CONNECTION_STRING`, `Server=127.0.0.1,1433;User Id=sa;Password=FSharp-Linq-1;...` by default | `SQLSERVER_REQUIRED=1` | `efcore-sqlserver-live.tsv` |
 | EF Core on PostgreSQL | `POSTGRESQL_CONNECTION_STRING`, `Host=127.0.0.1;Port=5432;Username=postgres;Password=fsharp-linq;...` by default | `POSTGRESQL_REQUIRED=1` | `efcore-postgresql-live.tsv` |
+| EF Core on MySQL | `MYSQL_CONNECTION_STRING`, `Server=127.0.0.1;Port=3306;User ID=root;Password=fsharp-linq;...` by default | `MYSQL_REQUIRED=1` | `efcore-mysql-live.tsv` |
 | MongoDB, the driver and EF Core | `MONGODB_CONNECTION_STRING`, `mongodb://127.0.0.1:27017` by default | `MONGODB_REQUIRED=1` | `mongodb-driver-live.tsv`, `efcore-mongodb-live.tsv` |
 
 The driver of MongoDB stores an object as it is, so a customer holds its orders and an order its lines, and a

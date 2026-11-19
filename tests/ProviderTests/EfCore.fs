@@ -111,6 +111,13 @@ module EfCore =
             .AddInterceptors(Recorders.suppressConnection :> IInterceptor, Recorders.first :> IInterceptor)
             .Options
 
+    /// Oracle's provider for MySQL. It does not ask the server for its version, so it needs none to choose its SQL.
+    let mySqlOptions =
+        DbContextOptionsBuilder<ShopContext>()
+            .UseMySQL("Server=localhost;Database=shop;User ID=unused;Password=unused")
+            .AddInterceptors(Recorders.suppressConnection :> IInterceptor, Recorders.first :> IInterceptor)
+            .Options
+
     let rec private capturedSql (error: exn) : string voption =
         match error with
         | null -> ValueNone

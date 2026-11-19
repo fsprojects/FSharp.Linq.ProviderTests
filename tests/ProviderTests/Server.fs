@@ -5,6 +5,7 @@ open System.Data.Common
 open Microsoft.Data.SqlClient
 open Microsoft.EntityFrameworkCore
 open Microsoft.EntityFrameworkCore.Diagnostics
+open MySql.Data.MySqlClient
 open Npgsql
 open FSharp.Core.UnitTests.Linq
 
@@ -60,7 +61,7 @@ module Server =
             with _ ->
                 server.Variable
 
-/// EF Core on a real SQL Server or PostgreSQL: every scenario runs against a database that the test creates and
+/// EF Core on a real SQL Server, PostgreSQL or MySQL: every scenario runs against a database that the test creates and
 /// deletes afterwards, and the rows are compared, as on SQLite.
 module EfCoreServer =
 
@@ -76,11 +77,20 @@ module EfCoreServer =
           RequiredVariable = "POSTGRESQL_REQUIRED"
           Default = "Host=127.0.0.1;Port=5432;Username=postgres;Password=fsharp-linq;Timeout=5" }
 
+    let mySql =
+        { Name = "MySQL"
+          Variable = "MYSQL_CONNECTION_STRING"
+          RequiredVariable = "MYSQL_REQUIRED"
+          Default = "Server=127.0.0.1;Port=3306;User ID=root;Password=fsharp-linq;Connection Timeout=5" }
+
     let private sqlServerConnection (database: string) =
         SqlConnectionStringBuilder(Server.address sqlServer, InitialCatalog = database).ConnectionString
 
     let private postgreSqlConnection (database: string) =
         NpgsqlConnectionStringBuilder(Server.address postgreSql, Database = database).ConnectionString
+
+    let private mySqlConnection (database: string) =
+        MySqlConnectionStringBuilder(Server.address mySql, Database = database).ConnectionString
 
     let sqlServerOptions (database: string) =
         DbContextOptionsBuilder<ShopContext>()
@@ -91,6 +101,12 @@ module EfCoreServer =
     let postgreSqlOptions (database: string) =
         DbContextOptionsBuilder<ShopContext>()
             .UseNpgsql(postgreSqlConnection database)
+            .AddInterceptors(Recorders.executing :> IInterceptor)
+            .Options
+
+    let mySqlOptions (database: string) =
+        DbContextOptionsBuilder<ShopContext>()
+            .UseMySQL(mySqlConnection database)
             .AddInterceptors(Recorders.executing :> IInterceptor)
             .Options
 
@@ -109,6 +125,10 @@ module EfCoreServer =
     /// Whether the PostgreSQL server answers.
     let probePostgreSql () =
         tryOpen (new NpgsqlConnection(postgreSqlConnection "postgres"))
+
+    /// Whether the MySQL server answers.
+    let probeMySql () =
+        tryOpen (new MySqlConnection(mySqlConnection "mysql"))
 
     /// A name for the database of one run, which no other run uses.
     let databaseName () = $"fsharp_linq_{Guid.NewGuid():N}"

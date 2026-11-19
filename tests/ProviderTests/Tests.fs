@@ -50,6 +50,10 @@ module EfCoreTests =
     let ``EF Core PostgreSQL`` () =
         Verify.provider "efcore-postgresql" false (Runner.run (EfCore.sqlOnly EfCore.postgreSqlOptions))
 
+    [<Fact>]
+    let ``EF Core MySQL`` () =
+        Verify.provider "efcore-mysql" false (Runner.run (EfCore.sqlOnly EfCore.mySqlOptions))
+
 /// The tests that need a server in a container. CI runs them in a job of their own, which starts the servers.
 module ServerTests =
 
@@ -62,6 +66,11 @@ module ServerTests =
     let ``EF Core PostgreSQL on a server`` () =
         Verify.onServer EfCoreServer.postgreSql EfCoreServer.probePostgreSql "efcore-postgresql-live" (fun () ->
             EfCoreServer.run EfCoreServer.postgreSqlOptions)
+
+    [<Fact>]
+    let ``EF Core MySQL on a server`` () =
+        Verify.onServer EfCoreServer.mySql EfCoreServer.probeMySql "efcore-mysql-live" (fun () ->
+            EfCoreServer.run EfCoreServer.mySqlOptions)
 
     [<Fact>]
     let ``MongoDB driver on a server`` () =
