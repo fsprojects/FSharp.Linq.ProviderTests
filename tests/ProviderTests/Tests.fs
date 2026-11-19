@@ -80,6 +80,10 @@ module ServerTests =
     let ``EF Core MongoDB on a server`` () =
         Verify.onServer Mongo.server Mongo.probe "efcore-mongodb-live" EfCoreMongo.run
 
+    [<Fact>]
+    let ``Marten on a server`` () =
+        Verify.onServer Marten.server Marten.probe "marten-live" Marten.run
+
 module MongoTests =
 
     [<Fact>]

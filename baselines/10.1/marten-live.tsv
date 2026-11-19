@@ -1,0 +1,253 @@
+# FSharp.Core 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
+# build 10.1.402-servicing.26505.111+a8dd0577c5c13f43a2f57fe33b4ff11b90f6371e
+# provider marten-live
+Projection	scalar	ok	select d.data ->> 'Name' from public.mt_doc_customer as d;
+Projection	entity	ok	select d.data from public.mt_doc_customer as d;
+Projection	computed scalars	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int, string>>
+Projection	let in select	fail ArgumentException	Static method requires null instance, non-static method requires non-null instance.
+Projection	tuple of two	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string>>
+Projection	tuple of seven	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string, string, int, int, int, int>>
+Projection	tuple of eight	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string, string, int, int, int, int, System.Tuple<int>>>
+Projection	tuple of nine	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string, string, int, int, int, int, System.Tuple<int, int>>>
+Projection	nested tuple	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<System.Tuple<int, string>, int>>
+Projection	struct tuple of two	fail Exception	unreachable
+Projection	struct tuple of nine	fail Exception	unreachable
+Projection	struct tuple inside a tuple	fail Exception	unreachable
+Projection	tuple inside a struct tuple	fail Exception	unreachable
+Projection	tuple taken apart by the next for	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+Projection	distinct of an item of a tuple taken apart by the next for	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+Projection	struct tuple taken apart by the next for	fail Exception	unreachable
+Projection	tuple of nine taken apart by the next for	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+Projection	record read by the next for	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+Projection	anonymous record read by the next for	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+Projection	record, fields in declaration order	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<FSharp.Core.UnitTests.Linq.NameAndAge>
+Projection	record, fields out of declaration order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	record, fields out of declaration order, read by the next where	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	record of three, fields rotated	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	record holding a tuple	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<.<>f__AnonymousType524221674<int, System.Tuple<int, string>>>
+Projection	anonymous record, fields in alphabetical order	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<.<>f__AnonymousType2531922041<int, string>>
+Projection	anonymous record, fields out of alphabetical order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	anonymous record, fields out of alphabetical order, read by the next where	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	anonymous record, method calls in fields out of order	fail ArgumentException	Static method requires null instance, non-static method requires non-null instance.
+Projection	anonymous record inside an anonymous record	fail InvalidOperationException	variable 'c' of type 'FSharp.Core.UnitTests.Linq.Customer' referenced from scope '', but it is not defined
+Projection	struct anonymous record, fields in alphabetical order	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<.<>f__AnonymousType10003959627718<int, string>>
+Projection	struct anonymous record, fields out of alphabetical order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	CLIMutable record, fields in declaration order	ok	select (jsonb_build_object('DtoName', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('DtoAge', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+Projection	CLIMutable record, fields out of declaration order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+Projection	class with property initializers	ok	select (jsonb_build_object('ViewName', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('ViewAge', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+Projection	option	fail BadLinqExpressionException	Marten cannot translate the Select() projection 'Some(c.Age)': its result type Microsoft.FSharp.Core.FSharpOption<int> is not a scalar Marten can read back. A computed projection can use member access, arithmetic, widening casts, string concatenation, ToUpper(), ToLower(), Length, and ToString() of ...
+Operator	where	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where CAST(d.data ->> 'Age' as integer) > :p0;
+Operator	where with string methods	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where (d.data ->> 'Name' LIKE :p0 or d.data ->> 'City' = :p1);
+Operator	where on a nullable property	fail BadLinqExpressionException	Marten does not (yet) support member DateTime.Year
+Operator	where with a nullable operator	ok	select d.id from public.mt_doc_orderline as d where CAST(d.data ->> 'Discount' as integer) > :p0;
+Operator	where with a let	fail BadLinqExpressionException	Unsupported expression type 'Assign' in binary expression
+Operator	if then	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where CAST(d.data ->> 'Age' as integer) > :p0;
+Operator	sortBy, thenByDescending	ok	select d.data ->> 'Name' from public.mt_doc_customer as d order by d.data ->> 'City', CAST(d.data ->> 'Age' as integer) desc;
+Operator	sortByDescending, thenBy	ok	select d.data ->> 'Name' from public.mt_doc_customer as d order by d.data ->> 'City' desc, CAST(d.data ->> 'Age' as integer);
+Operator	sortByNullable, thenByNullableDescending	wrong	select d.id from public.mt_doc_orderline as d order by CAST(d.data ->> 'Discount' as integer), d.id desc;
+Operator	sortByNullableDescending, thenByNullable	wrong	select d.id from public.mt_doc_orderline as d order by CAST(d.data ->> 'Discount' as integer) desc, d.id;
+Operator	distinct	ok	select DISTINCT(d.data ->> 'City') from public.mt_doc_customer as d;
+Operator	skip, take	ok	select d.data ->> 'Name' from public.mt_doc_customer as d order by d.id OFFSET :p0 LIMIT :p1;
+Operator	skipWhile, takeWhile	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'TakeWhile'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Operator	join	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Operator	groupJoin	fail NotSupportedException	Marten does not yet support GroupJoin as a final operator with collection materialization. Use GroupJoin + SelectMany for INNER JOIN, or GroupJoin + SelectMany + DefaultIfEmpty for LEFT JOIN.
+Operator	leftOuterJoin	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, int>>
+Operator	leftOuterJoin tested with isNull	fail ArgumentNullException	Value cannot be null. (Parameter 'arg0')
+Operator	count	n/a	
+Operator	exists	n/a	
+Operator	exists on a nullable property	n/a	
+Operator	exists with a let	n/a	
+Operator	all	n/a	
+Operator	contains	n/a	
+Operator	find	n/a	
+Operator	head	n/a	
+Operator	headOrDefault	n/a	
+Operator	last	n/a	
+Operator	lastOrDefault	n/a	
+Operator	exactlyOne	n/a	
+Operator	exactlyOneOrDefault	n/a	
+Operator	nth	n/a	
+Operator	minBy	n/a	
+Operator	maxBy	n/a	
+Operator	sumBy	n/a	
+Operator	averageBy	n/a	
+Operator	minByNullable	n/a	
+Operator	maxByNullable	n/a	
+Operator	sumByNullable	n/a	
+Operator	averageByNullable	n/a	
+Key	join on a scalar	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on a tuple	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on a struct tuple	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on a record, fields in declaration order	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on a record, fields out of declaration order	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on an anonymous record, fields in alphabetical order	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on an anonymous record, fields out of alphabetical order	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	join on an anonymous record that one side gets from a function	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	groupJoin on a tuple	fail NotSupportedException	Marten does not yet support GroupJoin as a final operator with collection materialization. Use GroupJoin + SelectMany for INNER JOIN, or GroupJoin + SelectMany + DefaultIfEmpty for LEFT JOIN.
+Key	groupJoin on a record, fields out of declaration order	fail NotSupportedException	Marten does not yet support GroupJoin as a final operator with collection materialization. Use GroupJoin + SelectMany for INNER JOIN, or GroupJoin + SelectMany + DefaultIfEmpty for LEFT JOIN.
+Key	groupJoin on an anonymous record, fields out of alphabetical order	fail NotSupportedException	Marten does not yet support GroupJoin as a final operator with collection materialization. Use GroupJoin + SelectMany for INNER JOIN, or GroupJoin + SelectMany + DefaultIfEmpty for LEFT JOIN.
+Key	leftOuterJoin on a tuple	fail BadLinqExpressionException	Marten does not (yet) support member int.Id
+Key	leftOuterJoin on a record, fields out of declaration order	fail BadLinqExpressionException	Marten can not (yet) deal with {var Units; ... }
+Key	leftOuterJoin on an anonymous record, fields out of alphabetical order	fail BadLinqExpressionException	Marten can not (yet) deal with {var Units; ... }
+Key	groupBy a scalar	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+Key	groupBy a scalar, groups themselves	fail BadLinqExpressionException	GroupBy must be followed by a Select() projection. Marten does not support returning IGrouping<K,T> directly.
+Key	groupBy a tuple	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+Key	groupBy a tuple, element of the key	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+Key	groupBy a struct tuple	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+Key	groupBy a record, fields in declaration order	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+Key	groupBy a record, fields out of declaration order	fail BadLinqExpressionException	Marten does not (yet) support member string.Age
+Key	groupBy an anonymous record, fields in alphabetical order	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+Key	groupBy an anonymous record, fields out of alphabetical order	fail BadLinqExpressionException	Marten does not (yet) support member string.Age
+Key	groupValBy a tuple of values	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, sum of one of them	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, average of one of them	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, max of one of them	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, one of them selected then summed	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, counted with a predicate	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupBy after a join, key and count	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	groupBy after a join, sum over the joined side	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	Select written in the query keeps its projection	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int, int>>
+Key	groups of groups counted against each other	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groups after a join as the result	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	groupValBy a tuple of values, the group compared with itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groups of groups, a group found among the groups it is in	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, the group as a sequence is still the group	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupBy a group, the group found among the elements it is the key of	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy records compared by reference, counted where an element is itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a record, a tuple in it compared with itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple, a record in it compared with itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values, the group beside its count	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple of values after a join, the group beside its count	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Key	groupValBy a tuple of values after two for, the group beside its count	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg81, _arg82) => new AnonymousObject`2(Item1 = _arg81, Item2 = _arg82)
+Key	groupValBy a record, the group beside its count	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	find in a nested query over two for	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Tuple`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core.UnitTests.Linq.Order]', but received type 'Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[FSharp.Core.UnitTests.Linq.Order,FSharp.Core...
+Key	groupValBy a record, a member of it that gives the record itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a record, a struct in it with a tuple in it compared with itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	groupValBy a tuple, a tuple in it compared with itself	fail BadLinqExpressionException	Marten does not support nested constructors in GroupBy projections
+Key	find among the groups of a nested query	fail BadLinqExpressionException	Marten does not (yet) support member int.Item2
+Structure	two for	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg1, _arg2) => new AnonymousObject`2(Item1 = _arg1, Item2 = _arg2)
+Structure	two for, where over both	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg3, _arg4) => new AnonymousObject`2(Item1 = _arg3, Item2 = _arg4)
+Structure	for, where, for, where	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg6, _arg7) => new AnonymousObject`2(Item1 = _arg6, Item2 = _arg7)
+Structure	for over a navigation collection	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg8, _arg9) => new AnonymousObject`2(Item1 = _arg8, Item2 = _arg9)
+Structure	for over two levels of navigation collections	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg10, x) => x
+Structure	three for	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg13, x) => x
+Structure	for after sortBy	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg17, _arg18) => new AnonymousObject`2(Item1 = _arg17, Item2 = _arg18)
+Structure	for after join	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Structure	let between for	fail InvalidCastException	Unable to cast object of type 'Marten.Linq.Members.IdMember' to type 'Marten.Linq.Members.ICollectionMember'.
+Structure	if then around for	fail BadLinqExpressionException	Marten can not (yet) deal with (_arg24, _arg25) => new AnonymousObject`2(Item1 = _arg24.Name, Item2 = _arg25.Id)
+Structure	for around if then	fail BadLinqExpressionException	Marten can not (yet) deal with (_arg26, _arg27) => new AnonymousObject`2(Item1 = _arg26.Name, Item2 = _arg27.Id)
+Structure	yield! of a navigation collection	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg28, x) => x
+Structure	distinct and take after two for	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg29, _arg30) => new AnonymousObject`2(Item1 = _arg29, Item2 = _arg30)
+Structure	groupBy after two for	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg31, _arg32) => new AnonymousObject`2(Item1 = _arg31, Item2 = _arg32)
+Structure	count over two for	n/a	
+Structure	exists over two for	n/a	
+Structure	nested query as the source	ok	select d.id from public.mt_doc_order as d where CAST(d.data ->> 'Total' as double precision) > :p0;
+Structure	nested query as the source of the second for	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg3, _arg5) => new AnonymousObject`2(Item1 = _arg3, Item2 = _arg5)
+Structure	nested query in select	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, System.Linq.IQueryable<int>>>
+Structure	second for over a source filtered by a lambda	fail BadLinqExpressionException	Unable to find any queryable members in expression (_arg8, _arg9) => new AnonymousObject`2(Item1 = _arg8, Item2 = _arg9)
+Structure	where with a lambda over another source	fail BadLinqExpressionException	Marten cannot parse this expression: '{ Customers = <seq> Orders = <seq> Lines = <seq> Products = <seq> }.Orders.Any(QuotationToLambdaExpression(SubstHelper(NewDelegate (Func`2, o, Call (None, op_Equality, [PropertyGet (Some (o), CustomerId, []), PropertyGet (Some (c), Id, [])])), new [] {c}, new []...
+Structure	where with All over another source	fail BadLinqExpressionException	Marten cannot derive a Collection.All() filter for expression '{ Customers = <seq> Orders = <seq> Lines = <seq> Products = <seq> }.Orders.Where(QuotationToLambdaExpression(SubstHelper(NewDelegate (Func`2, o, Call (None, op_Equality, [PropertyGet (Some (o), CustomerId, []), PropertyGet (Some (c), Id,...
+Structure	select with Count over another source	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+Structure	select of another source projected without reading the element	fail BadLinqExpressionException	Marten cannot translate the Select() projection '{ Customers = <seq> Orders = <seq> Lines = <seq> Products = <seq> }.Orders.Select(QuotationToLambdaExpression(SubstHelper(NewDelegate (Func`2, o, PropertyGet (Some (o), Id, [])), new [] {}, new [] {})))': its result type System.Linq.IQueryable<int> is...
+Structure	lambda over another source capturing a let	fail BadLinqExpressionException	Unsupported expression type 'Assign' in binary expression
+Structure	lambda nested two levels deep	fail BadLinqExpressionException	Marten cannot parse this expression: '{ Customers = <seq> Orders = <seq> Lines = <seq> Products = <seq> }.Orders.Any(QuotationToLambdaExpression(SubstHelper(NewDelegate (Func`2, o, IfThenElse (Call (None, op_Equality, [PropertyGet (Some (o), CustomerId, []), PropertyGet (Some (c), Id, [])]), Call (N...
+Structure	where with a method whose lambda reads nothing of the query	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where CAST(d.data ->> 'Age' as integer) > :p0;
+Structure	where with abs of a constant	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where CAST(d.data ->> 'Age' as integer) > :p0;
+Structure	where with a lambda that reads nothing of the query and calls abs	n/a	
+Structure	left join spelled leftOuterJoin	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+Structure	left join spelled groupJoin and DefaultIfEmpty	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+Structure	two left joins spelled leftOuterJoin	fail ArgumentException	Property 'FSharp.Core.UnitTests.Linq.Customer Item1' is not defined for type 'FSharp.Core.UnitTests.Linq.Order' (Parameter 'property')
+Structure	two left joins spelled groupJoin and DefaultIfEmpty	fail ArgumentException	Property 'FSharp.Core.UnitTests.Linq.Customer Item1' is not defined for type 'FSharp.Core.UnitTests.Linq.Order' (Parameter 'property')
+Structure	join after a left join	fail ArgumentException	Property 'FSharp.Core.UnitTests.Linq.Customer Item1' is not defined for type 'FSharp.Core.UnitTests.Linq.Order' (Parameter 'property')
+Structure	tuple selected after where	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string>>
+Structure	struct tuple selected after where	fail Exception	unreachable
+Structure	record selected after sortBy	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<FSharp.Core.UnitTests.Linq.NameAndAge>
+Structure	anonymous record selected after join	fail BadLinqExpressionException	Marten does not (yet) support Linq operator 'Join'. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() and filter in memory.
+Structure	nested tuple selected	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<System.Tuple<int, string>, int>>
+Structure	tuple of nine selected	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string, string, int, int, int, int, System.Tuple<int, int>>>
+Structure	tuple selected after groupBy	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+Structure	tuple selected before distinct	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, bool>>
+Structure	sorted nested query of records selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.String,System.Collections.Generic.IEnumerable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32...
+Structure	sorted nested query over a sequence selected in a tuple	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
+Structure	sorted nested query over a sequence selected in a tuple, then take	fail ArgumentException	Type mismatch when building 'args': invalid parameter for a method or indexer property. Expected 'System.Linq.IQueryable`1[Microsoft.FSharp.Linq.RuntimeHelpers.AnonymousObject`2[System.Int32,System.Collections.Generic.IEnumerable`1[System.Int32]]]', but received type 'System.Linq.IQueryable`1[Micros...
+Structure	all over two for	n/a	
+Structure	sumBy over two for	n/a	
+Structure	averageBy after a join	n/a	
+Structure	minByNullable over two for	n/a	
+Structure	sumByNullable after a join	n/a	
+Structure	maxBy after a record select	n/a	
+Structure	exists after a record select	n/a	
+Structure	exists after a record select, the record compared with itself	n/a	
+Structure	exists after a record select, a member of the record that gives the record itself	n/a	
+Structure	exists after a record select, a struct in it with a tuple in it compared with itself	n/a	
+Structure	sumBy after a struct select, a record in it changed through the struct passed twice	n/a	
+Structure	exists with a nested query, the nested query compared with itself	n/a	
+Structure	exists with a nested query of groups, the nested query compared with itself	n/a	
+Structure	exists with a nested query of struct tuples, the nested query compared with itself	fail Exception	unreachable
+Structure	all after a tuple select, the tuple compared with itself	n/a	
+Structure	sumBy after a tuple select, a tuple in it compared with itself	n/a	
+Structure	exists after a tuple select	n/a	
+Structure	count after a tuple select	n/a	
+MethodSyntax	Select a tuple	wrong	select (jsonb_build_object('item2', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('item1', d.id))) as data from public.mt_doc_customer as d;
+MethodSyntax	Select a struct tuple	wrong	select (jsonb_build_object('item2', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('item1', d.id))) as data from public.mt_doc_customer as d;
+MethodSyntax	Where over a query built earlier	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression2' to type 'System.Linq.Expressions.ConstantExpression'.
+MethodSyntax	Where over a query built earlier with a let	fail InvalidCastException	Unable to cast object of type 'System.Linq.Expressions.MethodCallExpression2' to type 'System.Linq.Expressions.ConstantExpression'.
+MethodSyntax	Select a record, fields in declaration order	ok	select (jsonb_build_object('PersonName', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('PersonAge', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+MethodSyntax	Select a record, fields out of declaration order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Select an anonymous record, fields in alphabetical order	ok	select (jsonb_build_object('Name', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('Age', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+MethodSyntax	Select an anonymous record, fields out of alphabetical order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Select an anonymous record, method calls in fields out of order	fail ArgumentException	Static method requires null instance, non-static method requires non-null instance.
+MethodSyntax	Select a struct anonymous record, fields out of alphabetical order	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Select with a let used twice	fail ArgumentException	Static method requires null instance, non-static method requires non-null instance.
+MethodSyntax	Select with a count in a let used twice	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Select with a call in a let used twice	fail ArgumentNullException	Value cannot be null. (Parameter 'arg0')
+MethodSyntax	Select with nested lets	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Select on a nullable property	fail ArgumentNullException	Value cannot be null. (Parameter 'right')
+MethodSyntax	Where taking a tuple apart	wrong	select (jsonb_build_object('item2', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('item1', d.id))) as data from public.mt_doc_customer as d;
+MethodSyntax	Where taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	OrderBy taking a tuple apart	fail BadLinqExpressionException	Marten cannot translate an OrderBy() applied after the projection 'new Tuple`2(c.Name, c.Age)': its result type System.Tuple<string, int> is not a scalar Marten can read back. Order the documents before the Select(), or project a scalar.
+MethodSyntax	OrderBy taking a struct tuple apart	fail ArgumentException	The tuple index '1' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	GroupBy taking a tuple apart	wrong	select (jsonb_build_object('item1', d.data ->> 'City') || jsonb_strip_nulls(jsonb_build_object('item2', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+MethodSyntax	GroupBy taking a struct tuple apart	fail ArgumentException	The tuple index '0' was out of range for tuple type 'System.ValueTuple`2[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'. (Paramete...
+MethodSyntax	Where reading a record	wrong	select (jsonb_build_object('PersonName', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('PersonAge', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+MethodSyntax	OrderBy reading a record	fail BadLinqExpressionException	Marten cannot translate an OrderBy() applied after the projection 'new NameAndAge(c.Name, c.Age)': its result type FSharp.Core.UnitTests.Linq.NameAndAge is not a scalar Marten can read back. Order the documents before the Select(), or project a scalar.
+MethodSyntax	GroupBy reading a record	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+MethodSyntax	Where reading an anonymous record	wrong	select (jsonb_build_object('Name', d.data ->> 'Name') || jsonb_strip_nulls(jsonb_build_object('Age', CAST(d.data ->> 'Age' as integer)))) as data from public.mt_doc_customer as d;
+MethodSyntax	OrderBy reading an anonymous record	fail BadLinqExpressionException	Marten cannot translate an OrderBy() applied after the projection 'new <>f__AnonymousType2531922041`2(c.Age, c.Name)': its result type .<>f__AnonymousType2531922041<int, string> is not a scalar Marten can read back. Order the documents before the Select(), or project a scalar.
+MethodSyntax	GroupBy reading an anonymous record	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+MethodSyntax	Where taking the last of nine apart	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+MethodSyntax	Where taking the last of a struct nine apart	fail ArgumentException	The tuple index '7' was out of range for tuple type 'System.ValueTuple`8[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Stri...
+MethodSyntax	Where over a query that selects a tuple	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<int, string>>
+MethodSyntax	Where over a query that selects a record	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<FSharp.Core.UnitTests.Linq.NameAndAge>
+MethodSyntax	Where on a nullable property	fail BadLinqExpressionException	Unsupported expression type 'Assign' in binary expression
+MethodSyntax	Where with a lambda over another source	fail BadLinqExpressionException	Marten cannot parse this expression: '{ Customers = <seq> Orders = <seq> Lines = <seq> Products = <seq> }.Orders.Any(QuotationToLambdaExpression(SubstHelper(NewDelegate (Func`2, o, Call (None, op_Equality, [PropertyGet (Some (o), CustomerId, []), PropertyGet (Some (c), Id, [])])), new [] {c}, new []...
+MethodSyntax	Select with a lambda over another source	n/a	
+MethodSyntax	SelectMany with a lambda over another source	ok	WITH mt_temp_id_list1CTE as (select jsonb_array_elements(CAST(d.data ->> 'Orders' as jsonb)) as data from public.mt_doc_customer as d) , mt_temp_id_list2CTE as (select CAST(d.data ->> 'Id' as integer) as data from mt_temp_id_list1CTE as d) select d.data from mt_temp_id_list2CTE as d;
+MethodSyntax	OrderBy, ThenByDescending	ok	select d.data ->> 'Name' from public.mt_doc_customer as d order by d.data ->> 'City', CAST(d.data ->> 'Age' as integer) desc;
+MethodSyntax	GroupBy a tuple	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+MethodSyntax	SelectMany over a navigation collection	ok	WITH mt_temp_id_list1CTE as (select jsonb_array_elements(CAST(d.data ->> 'Orders' as jsonb)) as data from public.mt_doc_customer as d) , mt_temp_id_list2CTE as (select CAST(d.data ->> 'Id' as integer) as data from mt_temp_id_list1CTE as d) select d.data from mt_temp_id_list2CTE as d;
+FSharpOperator	abs and sign in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Abs$W(ToFSharpFunc(arg0_0 => Abs(arg0_0)), (c.Age - 30))' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	min and max in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Max(c.Age, 30)' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	abs, sign, min and max in select	fail InvalidOperationException	variable 'c' of type 'FSharp.Core.UnitTests.Linq.Customer' referenced from scope '', but it is not defined
+FSharpOperator	floor and ceil in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Floor$W(ToFSharpFunc(arg0_0 => Floor(arg0_0)), l.Price)' to a constant because it references the free parameter 'l' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	round and truncate in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Round$W(ToFSharpFunc(arg0_0 => Round(arg0_0)), (l.Price * 1.1))' to a constant because it references the free parameter 'l' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	sqrt and ** in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Sqrt$W(ToFSharpFunc(arg0_0 => Sqrt(arg0_0)), l.Price)' to a constant because it references the free parameter 'l' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	exp, log and log10 in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Exp$W(ToFSharpFunc(arg0_0 => Exp(arg0_0)), (Convert(c.Age, Double) / 10))' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	sin, cos and tan in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Sin$W(ToFSharpFunc(arg0_0 => Sin(arg0_0)), Convert(c.Age, Double))' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	asin, acos, atan and atan2 in where	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+FSharpOperator	sinh, cosh and tanh in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Sinh$W(ToFSharpFunc(arg0_0 => Sinh(arg0_0)), (Convert(c.Age, Double) / 10))' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	sqrt, floor, ceil and truncate in select	fail InvalidOperationException	variable 'l' of type 'FSharp.Core.UnitTests.Linq.OrderLine' referenced from scope '', but it is not defined
+FSharpOperator	sqrt of a float32 in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Sqrt$W(ToFSharpFunc(arg0_0 => Sqrt(arg0_0)), Convert(l.Price, Single))' to a constant because it references the free parameter 'l' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	fst and snd after select into	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<string>
+FSharpOperator	fst and snd of a let-bound tuple	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, int>>
+FSharpOperator	isNull in where	fail NotSupportedException	Marten does not (yet) support Linq queries using the Microsoft.FSharp.Core.Operators.IsNull() method. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() an...
+FSharpOperator	isNull of a boxed nullable in select	fail NotSupportedException	Marten does not know how to use result type System.Collections.Generic.IReadOnlyList<System.Tuple<string, bool>>
+FSharpOperator	box compared with null in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Box(child)' to a constant because it references the free parameter 'child' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	boxed nullable compared with null in where	fail BadLinqExpressionException	Marten cannot reduce the expression 'Box(c.Registered)' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	not in where	ok	select d.data ->> 'Name' from public.mt_doc_customer as d where CAST(d.data ->> 'Age' as integer) <= :p0;
+FSharpOperator	Where with abs and max	fail BadLinqExpressionException	Marten cannot reduce the expression 'Abs$W(ToFSharpFunc(arg0_0 => Abs(arg0_0)), (c.Age - 30))' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	Where with sqrt and sin	fail BadLinqExpressionException	Marten cannot reduce the expression 'Sqrt$W(ToFSharpFunc(arg0_0 => Sqrt(arg0_0)), l.Price)' to a constant because it references the free parameter 'l' of type 'OrderLine'. This usually indicates a Linq parser issue at the call site.
+FSharpOperator	Select with floor and sign	ok	select d.data as data from public.mt_doc_orderline as d;
+FSharpOperator	GroupBy a tuple, fst of the key	fail BadLinqExpressionException	Cannot select the entire composite GroupBy key directly. Access individual key members like g.Key.Color instead.
+FSharpOperator	Where with isNull	fail NotSupportedException	Marten does not (yet) support Linq queries using the Microsoft.FSharp.Core.Operators.IsNull() method. Supported operators are documented at https://martendb.io/documents/querying/linq/operators.html; for anything else use MatchesSql(), session.QueryAsync<T>(sql), or materialize with ToListAsync() an...
+FSharpOperator	Where with box compared with null	fail BadLinqExpressionException	Marten cannot reduce the expression 'Box(c.Registered)' to a constant because it references the free parameter 'c' of type 'Customer'. This usually indicates a Linq parser issue at the call site.

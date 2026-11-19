@@ -115,6 +115,7 @@ jobs:
           POSTGRESQL_REQUIRED: '1'
           MONGODB_REQUIRED: '1'
           MYSQL_REQUIRED: '1'
+          MARTEN_REQUIRED: '1'
 
       - name: Upload what the providers did
         if: always()
