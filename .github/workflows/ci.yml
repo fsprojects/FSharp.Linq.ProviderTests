@@ -52,3 +52,82 @@ jobs:
           name: actual-${{ matrix.os }}
           path: artifacts/actual/*.tsv
           if-no-files-found: warn
+
+  # The providers that need a server in a container. Service containers run on Linux runners only; the job above
+  # skips these tests. The addresses and passwords are the defaults of the tests
+  servers:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: FSharp-Linq-1
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P FSharp-Linq-1 -Q 'SELECT 1'"
+          --health-interval 10s --health-timeout 5s --health-retries 20
+
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: fsharp-linq
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: fsharp-linq
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -pfsharp-linq"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+
+      # Azurite answers within a second or two of starting; the steps before the tests take longer
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite
+        ports:
+          - 10002:10002
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up the .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Test the providers on servers
+        run: >-
+          dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release
+          --filter "FullyQualifiedName~FSharp.Linq.ProviderTests.ServerTests"
+        env:
+          # A server that does not answer is an error here, not a skipped test
+          SQLSERVER_REQUIRED: '1'
+          POSTGRESQL_REQUIRED: '1'
+          MONGODB_REQUIRED: '1'
+          MYSQL_REQUIRED: '1'
+          MARTEN_REQUIRED: '1'
+          AZURITE_REQUIRED: '1'
+
+      - name: Upload what the providers did
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actual-servers
+          path: artifacts/actual/*.tsv
+          if-no-files-found: warn

@@ -1,22 +1,45 @@
 namespace FSharp.Linq.ProviderTests
 
+open System
 open System.Collections.Generic
 open System.Data.Common
 open System.Threading
 open System.Threading.Tasks
 open Microsoft.EntityFrameworkCore
 open Microsoft.EntityFrameworkCore.Diagnostics
+open Microsoft.EntityFrameworkCore.Storage.ValueConversion
 open FSharp.Core.UnitTests.Linq
 
 /// The entities of the scenarios as EF Core maps them: a table for each class, named after the class.
 type ShopContext(options: DbContextOptions<ShopContext>) =
     inherit DbContext(options)
 
-    override _.OnModelCreating model =
+    override this.OnModelCreating model =
         model.Entity<Customer>() |> ignore
         model.Entity<Order>() |> ignore
         model.Entity<OrderLine>() |> ignore
         model.Entity<Product>() |> ignore
+
+        // The data brings its own keys. SQL Server refuses a value for an identity column, which SQLite and
+        // PostgreSQL take
+        if this.Database.IsSqlServer() then
+            model.Entity<Customer>().Property(fun c -> c.Id).ValueGeneratedNever() |> ignore
+            model.Entity<Order>().Property(fun o -> o.Id).ValueGeneratedNever() |> ignore
+            model.Entity<OrderLine>().Property(fun l -> l.Id).ValueGeneratedNever() |> ignore
+            model.Entity<Product>().Property(fun p -> p.Id).ValueGeneratedNever() |> ignore
+
+        // The dates of the data have no time zone. Npgsql maps DateTime to timestamp with time zone, which only
+        // takes UTC, so they are written as UTC. The column stays what a model without the conversion has, and so
+        // does the SQL
+        if this.Database.IsNpgsql() then
+            model.Entity<Customer>().Property(fun c -> c.Registered).HasConversion(ShopContext.AsUtc :> ValueConverter)
+            |> ignore
+
+    static member private AsUtc =
+        ValueConverter<DateTime, DateTime>(
+            (fun date -> DateTime.SpecifyKind(date, DateTimeKind.Utc)),
+            (fun date -> DateTime.SpecifyKind(date, DateTimeKind.Utc))
+        )
 
 /// The first command that a scenario sent. A provider that is asked for its SQL only throws this from the
 /// interceptor, so that no command reaches a server that is not there.

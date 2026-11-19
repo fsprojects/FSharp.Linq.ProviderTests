@@ -50,10 +50,10 @@ module EfCore =
     let private verdictOf (scenario: Scenario) (actual: obj list) =
         if Runner.sameRows scenario (Data()) actual then Status.Ok else Status.Wrong
 
-    /// Runs the scenario on SQLite and compares the rows with the expected ones.
-    let sqlite (shop: SqliteShop) (scenario: Scenario) : Status * string =
+    /// Runs the scenario on the database of the options and compares the rows with the expected ones.
+    let execute (options: DbContextOptions<ShopContext>) (scenario: Scenario) : Status * string =
         let commands = CommandRecorder.Start()
-        use context = new ShopContext(shop.Options)
+        use context = new ShopContext(options)
 
         try
             let actual =
@@ -64,6 +64,9 @@ module EfCore =
             verdictOf scenario actual, sqlOf commands
         with error ->
             Runner.failed error
+
+    /// Runs the scenario on SQLite and compares the rows with the expected ones.
+    let sqlite (shop: SqliteShop) (scenario: Scenario) : Status * string = execute shop.Options scenario
 
     let private toListAsync =
         typeof<EntityFrameworkQueryableExtensions>.GetMethods()
@@ -105,6 +108,13 @@ module EfCore =
     let postgreSqlOptions =
         DbContextOptionsBuilder<ShopContext>()
             .UseNpgsql("Host=localhost;Database=shop;Username=unused;Password=unused")
+            .AddInterceptors(Recorders.suppressConnection :> IInterceptor, Recorders.first :> IInterceptor)
+            .Options
+
+    /// Oracle's provider for MySQL. It does not ask the server for its version, so it needs none to choose its SQL.
+    let mySqlOptions =
+        DbContextOptionsBuilder<ShopContext>()
+            .UseMySQL("Server=localhost;Database=shop;User ID=unused;Password=unused")
             .AddInterceptors(Recorders.suppressConnection :> IInterceptor, Recorders.first :> IInterceptor)
             .Options
 

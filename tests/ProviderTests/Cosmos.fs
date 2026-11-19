@@ -86,7 +86,8 @@ module Cosmos =
           Lines = lines.GetItemLinqQueryable<OrderLine>(true)
           Products = products.GetItemLinqQueryable<Product>(true) }
 
-    let rec private mentionsOffline (error: exn) =
+    /// Whether the failure is the refusal of <see cref="Offline"/> to send a request.
+    let rec mentionsOffline (error: exn) =
         match error with
         | null -> false
         | error -> error.Message.Contains(Offline.Message, StringComparison.Ordinal) || mentionsOffline error.InnerException

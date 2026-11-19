@@ -6,9 +6,13 @@ providers:
 | Provider | What the tests do |
 |---|---|
 | EF Core on SQLite | run every scenario against an in-memory database and compare the rows, also with `ToListAsync` |
-| EF Core on SQL Server and on PostgreSQL | ask for the SQL of every scenario; there is no server |
+| EF Core on SQL Server, on PostgreSQL and on MySQL (Oracle's provider) | ask for the SQL of every scenario without a server, and run every scenario on a server in a container when one is there |
 | Azure Cosmos DB | ask for the SQL of every scenario without a server, and run every scenario on the Azure Cosmos DB Emulator when one is there |
+| EF Core on Azure Cosmos DB | the same with the Cosmos provider of EF Core, which translates the queries itself |
 | linq2db on SQLite | run every scenario and compare the rows |
+| Marten on PostgreSQL | run every scenario on a server in a container when one is there |
+| Azure Table Storage (Azure.Data.Tables) | turn the `where` clauses of every scenario that Table Storage can be asked into the text of its filter without a server, and run those scenarios on Azurite in a container when it is there |
+| MongoDB, with the LINQ provider of the driver and with EF Core | ask the driver for the pipeline of every scenario without a server, and run every scenario with both on a server in a container when one is there; the EF Core provider cannot give a query without running it |
 | SQLProvider on SQLite | run about sixty queries in the style of SQLProvider users against `db/shop.db` and compare the rows |
 
 A compiler or FSharp.Core change that stops a query from translating, or that makes it return other rows, fails the
@@ -80,6 +84,55 @@ afterwards. Both emulators work and answer a little differently, so each has its
 | `COSMOS_EMULATOR_REQUIRED` | `1` makes a missing emulator an error; without it the test is skipped. The Linux job of CI sets it |
 
 The vNext emulator runs in Docker: `.github/scripts/start-cosmos-emulator.ps1`.
+
+The test `EF Core Cosmos emulator` does the same with the Cosmos provider of EF Core, with the same variables, and
+writes `efcore-cosmos-emulator-windows.tsv` or `efcore-cosmos-emulator-vnext.tsv`. The vNext one is recorded; the
+test passes while the Windows one is not there yet. The provider refuses synchronous queries unless its warning
+`CosmosEventId.SyncNotSupported` is turned off, and the tests turn it off: a query expression enumerates its rows.
+
+## Servers in containers
+
+The tests of the module `ServerTests` run the scenarios on a server, in a database that they create and delete
+afterwards, and compare the rows. Each test is skipped when its server does not answer. The job `servers` of CI starts
+the servers as service containers and makes a missing one an error. The defaults are the addresses of these
+containers, with throwaway passwords:
+
+```
+docker run -d -p 1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=FSharp-Linq-1 mcr.microsoft.com/mssql/server:2022-latest
+docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=fsharp-linq postgres:17
+docker run -d -p 27017:27017 mongo:8
+docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=fsharp-linq mysql:8.4
+docker run -d -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+```
+
+| Provider | Address | Variable that makes a missing server an error | Baseline |
+|---|---|---|---|
+| EF Core on SQL Server | `SQLSERVER_CONNECTION_STRING`, `Server=127.0.0.1,1433;User Id=sa;Password=FSharp-Linq-1;...` by default | `SQLSERVER_REQUIRED=1` | `efcore-sqlserver-live.tsv` |
+| EF Core on PostgreSQL | `POSTGRESQL_CONNECTION_STRING`, `Host=127.0.0.1;Port=5432;Username=postgres;Password=fsharp-linq;...` by default | `POSTGRESQL_REQUIRED=1` | `efcore-postgresql-live.tsv` |
+| Marten | the PostgreSQL server above, `POSTGRESQL_CONNECTION_STRING` | `MARTEN_REQUIRED=1` | `marten-live.tsv` |
+| EF Core on MySQL | `MYSQL_CONNECTION_STRING`, `Server=127.0.0.1;Port=3306;User ID=root;Password=fsharp-linq;...` by default | `MYSQL_REQUIRED=1` | `efcore-mysql-live.tsv` |
+| Azure Table Storage | `AZURITE_CONNECTION_STRING`, the documented account of Azurite at `http://127.0.0.1:10002` by default | `AZURITE_REQUIRED=1` | `azure-tables-azurite.tsv` |
+| MongoDB, the driver and EF Core | `MONGODB_CONNECTION_STRING`, `mongodb://127.0.0.1:27017` by default | `MONGODB_REQUIRED=1` | `mongodb-driver-live.tsv`, `efcore-mongodb-live.tsv` |
+
+The driver of MongoDB stores an object as it is, so a customer holds its orders and an order its lines, and a
+navigation of a scenario reads the embedded documents. The EF Core provider of MongoDB has no relationships between
+collections, so its model leaves the navigations out, and the scenarios that use them fail with it.
+"Structure / distinct and take after two for" takes a row of a query that has no order, so any row is right, and
+MongoDB, which groups in no fixed order, returns another one from run to run: it is `n/a` for the driver.
+
+Marten stores the JSON of an object, so it embeds the orders and the lines as the driver of MongoDB does. Since
+Marten 9 a query can only be read asynchronously: the test reads the rows with `ToListAsync`, and a scenario that
+computes a value, which a query expression computes synchronously, is `n/a`.
+
+Azure.Data.Tables has no LINQ provider. A query of Table Storage is a filter of the rows of one table, an
+`Expression<Func<T, bool>>` that `TableClient.CreateQueryFilter` turns into the text that the service reads. A
+scenario can be asked when its query is a table with `where` clauses, and perhaps a projection at the end, which the
+client applies to the rows that come back, as an application does; the filters of the clauses are joined with `and`.
+Every other scenario, and every scenario that computes a value or whose projection reads a navigation (a table has
+none), is `n/a`: `azure-tables-offline.tsv` without a server, `azure-tables-azurite.tsv` on Azurite. A date is
+stored as UTC.
+
+To run only these tests: `dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release --filter "FullyQualifiedName~ServerTests"`.
 
 ## SQLProvider
 
