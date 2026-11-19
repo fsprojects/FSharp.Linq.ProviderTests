@@ -86,8 +86,8 @@ afterwards. Both emulators work and answer a little differently, so each has its
 The vNext emulator runs in Docker: `.github/scripts/start-cosmos-emulator.ps1`.
 
 The test `EF Core Cosmos emulator` does the same with the Cosmos provider of EF Core, with the same variables, and
-writes `efcore-cosmos-emulator-windows.tsv` or `efcore-cosmos-emulator-vnext.tsv`. It passes while there is no
-baseline yet; the first run with an emulator gives one. The provider refuses synchronous queries unless its warning
+writes `efcore-cosmos-emulator-windows.tsv` or `efcore-cosmos-emulator-vnext.tsv`. The vNext one is recorded; the
+test passes while the Windows one is not there yet. The provider refuses synchronous queries unless its warning
 `CosmosEventId.SyncNotSupported` is turned off, and the tests turn it off: a query expression enumerates its rows.
 
 ## Servers in containers
