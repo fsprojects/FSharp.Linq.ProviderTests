@@ -2,6 +2,12 @@ namespace FSharp.Linq.ProviderTests
 
 open Xunit
 
+module AssemblyFixtures =
+
+    // Created before any test runs
+    [<assembly: AssemblyFixture(typeof<MongoClassMaps>)>]
+    do ()
+
 module Verify =
 
     /// Checks what a provider did with every scenario against the baseline of the provider.
@@ -56,6 +62,20 @@ module ServerTests =
     let ``EF Core PostgreSQL on a server`` () =
         Verify.onServer EfCoreServer.postgreSql EfCoreServer.probePostgreSql "efcore-postgresql-live" (fun () ->
             EfCoreServer.run EfCoreServer.postgreSqlOptions)
+
+    [<Fact>]
+    let ``MongoDB driver on a server`` () =
+        Verify.onServer Mongo.server Mongo.probe "mongodb-driver-live" Mongo.run
+
+    [<Fact>]
+    let ``EF Core MongoDB on a server`` () =
+        Verify.onServer Mongo.server Mongo.probe "efcore-mongodb-live" EfCoreMongo.run
+
+module MongoTests =
+
+    [<Fact>]
+    let ``MongoDB driver without a server`` () =
+        Verify.provider "mongodb-driver-offline" false (Runner.run Mongo.offline)
 
 module Linq2DbTests =
 

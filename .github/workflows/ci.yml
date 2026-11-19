@@ -79,6 +79,14 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
 
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ping:1}).ok'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+
     steps:
       - uses: actions/checkout@v6
 
@@ -95,6 +103,7 @@ jobs:
           # A server that does not answer is an error here, not a skipped test
           SQLSERVER_REQUIRED: '1'
           POSTGRESQL_REQUIRED: '1'
+          MONGODB_REQUIRED: '1'
 
       - name: Upload what the providers did
         if: always()

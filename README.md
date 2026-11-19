@@ -10,6 +10,7 @@ providers:
 | Azure Cosmos DB | ask for the SQL of every scenario without a server, and run every scenario on the Azure Cosmos DB Emulator when one is there |
 | EF Core on Azure Cosmos DB | the same with the Cosmos provider of EF Core, which translates the queries itself |
 | linq2db on SQLite | run every scenario and compare the rows |
+| MongoDB, with the LINQ provider of the driver and with EF Core | ask the driver for the pipeline of every scenario without a server, and run every scenario with both on a server in a container when one is there; the EF Core provider cannot give a query without running it |
 | SQLProvider on SQLite | run about sixty queries in the style of SQLProvider users against `db/shop.db` and compare the rows |
 
 A compiler or FSharp.Core change that stops a query from translating, or that makes it return other rows, fails the
@@ -97,12 +98,18 @@ containers, with throwaway passwords:
 ```
 docker run -d -p 1433:1433 -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=FSharp-Linq-1 mcr.microsoft.com/mssql/server:2022-latest
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=fsharp-linq postgres:17
+docker run -d -p 27017:27017 mongo:8
 ```
 
 | Provider | Address | Variable that makes a missing server an error | Baseline |
 |---|---|---|---|
 | EF Core on SQL Server | `SQLSERVER_CONNECTION_STRING`, `Server=127.0.0.1,1433;User Id=sa;Password=FSharp-Linq-1;...` by default | `SQLSERVER_REQUIRED=1` | `efcore-sqlserver-live.tsv` |
 | EF Core on PostgreSQL | `POSTGRESQL_CONNECTION_STRING`, `Host=127.0.0.1;Port=5432;Username=postgres;Password=fsharp-linq;...` by default | `POSTGRESQL_REQUIRED=1` | `efcore-postgresql-live.tsv` |
+| MongoDB, the driver and EF Core | `MONGODB_CONNECTION_STRING`, `mongodb://127.0.0.1:27017` by default | `MONGODB_REQUIRED=1` | `mongodb-driver-live.tsv`, `efcore-mongodb-live.tsv` |
+
+The driver of MongoDB stores an object as it is, so a customer holds its orders and an order its lines, and a
+navigation of a scenario reads the embedded documents. The EF Core provider of MongoDB has no relationships between
+collections, so its model leaves the navigations out, and the scenarios that use them fail with it.
 
 To run only these tests: `dotnet test tests/ProviderTests/FSharp.Linq.ProviderTests.fsproj -c Release --filter "FullyQualifiedName~ServerTests"`.
 

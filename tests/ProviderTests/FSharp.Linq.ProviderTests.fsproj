@@ -33,6 +33,8 @@
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.63.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="linq2db" Version="6.5.1" />
+    <PackageReference Include="MongoDB.Driver" Version="3.14.0" />
+    <PackageReference Include="MongoDB.EntityFrameworkCore" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,6 +45,7 @@
     <Compile Include="CosmosEmulator.fs" />
     <Compile Include="EfCoreCosmos.fs" />
     <Compile Include="Linq2Db.fs" />
+    <Compile Include="Mongo.fs" />
     <Compile Include="Tests.fs" />
   </ItemGroup>
 
