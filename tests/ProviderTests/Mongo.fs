@@ -99,6 +99,17 @@ module Mongo =
         | :? TimeoutException -> true
         | error -> timedOut error.InnerException
 
+    // Takes rows of a query that has no order, so the provider may return any rows; MongoDB groups in no fixed order
+    // and returns other rows from run to run. A property of the scenario, not of MongoDB
+    let private takesWithoutOrder = set [ "distinct and take after two for" ]
+
+    let private withoutOrder (execute: Runner.Execute) : Runner.Execute =
+        fun scenario ->
+            if takesWithoutOrder.Contains scenario.Name then
+                Status.NotApplicable, "take without an order: the provider may return any rows"
+            else
+                execute scenario
+
     // Nothing listens on port 1, and a scenario that computes a value gives up on it at once
     let private offlineClient =
         lazy (new MongoClient(settings "mongodb://127.0.0.1:1" (TimeSpan.FromMilliseconds 100.0)))
@@ -126,7 +137,7 @@ module Mongo =
     /// translation. A scenario that computes a value has to send the query to produce the value, so there is
     /// nothing to ask for. The driver translates a part of a query only when it runs it, for example the
     /// materialization of the rows, so a scenario can pass here and fail on a server.
-    let offline (scenario: Scenario) : Status * string =
+    let private pipelineOf (scenario: Scenario) : Status * string =
         let database = offlineClient.Value.GetDatabase "shop"
 
         try
@@ -141,6 +152,9 @@ module Mongo =
         with
         | error when timedOut error -> Status.NotApplicable, ""
         | error -> Runner.failed error
+
+    /// The pipeline of every scenario, without a server; see <c>pipelineOf</c>.
+    let offline: Runner.Execute = withoutOrder pipelineOf
 
     let private connect () =
         new MongoClient(settings (Server.address server) (TimeSpan.FromSeconds 5.0))
@@ -199,7 +213,7 @@ module Mongo =
             database.GetCollection<Order>("Orders").InsertMany data.Orders
             database.GetCollection<OrderLine>("Lines").InsertMany data.Lines
             database.GetCollection<Product>("Products").InsertMany data.Products
-            Runner.run (execute name (tables database)))
+            Runner.run (withoutOrder (execute name (tables database))))
 
 /// Registers the class maps of the driver once, before any test runs: see <c>Mongo.registerClassMaps</c>.
 type MongoClassMaps() =

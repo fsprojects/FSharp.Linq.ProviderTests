@@ -137,7 +137,7 @@ Structure	let between for	fail BsonSerializationException	MongoDB.Bson.BsonSeria
 Structure	if then around for	ok	shop.Customers.Aggregate([{ "$match" : { "Age" : { "$gt" : 26 } } }, { "$project" : { "_v" : { "$map" : { "input" : "$Orders", "as" : "v__0", "in" : { "Item1" : "$Name", "Item2" : "$$v__0._id" } } }, "_id" : 0 } }, { "$unwind" : "$_v" }, { "$project" : { "_v" : ["$_v.Item1", "$_v.Item2"], "_id" : 0 } }])
 Structure	for around if then	fail BsonSerializationException	MongoDB.Bson.BsonSerializationException: The property 'Expression' of type 'MongoDB.Driver.Linq.Linq3Implementation.MongoQuery`2[[FSharp.Core.UnitTests.Linq.Order, FSharp.Linq.ProviderTests.Scenarios, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[FSharp.Core.UnitTests.Linq.Order, FSharp.Li...
 Structure	yield! of a navigation collection	ok	shop.Customers.Aggregate([{ "$project" : { "_v" : "$Orders", "_id" : 0 } }, { "$unwind" : "$_v" }])
-Structure	distinct and take after two for	ok	shop.Customers.Aggregate([{ "$project" : { "_v" : { "$map" : { "input" : "$Orders", "as" : "v__0", "in" : { "Item1" : "$$ROOT", "Item2" : "$$v__0" } } }, "_id" : 0 } }, { "$unwind" : "$_v" }, { "$project" : { "_v" : "$_v.Item1.City", "_id" : 0 } }, { "$group" : { "_id" : "$$ROOT" } }, { "$replaceRoot" : { "newRoot" : "$_id" } }, { "$limit" : 1 }])
+Structure	distinct and take after two for	n/a	take without an order: the provider may return any rows
 Structure	groupBy after two for	fail ExpressionNotSupportedException	Expression not supported: new Grouping`2(_arg33.Key, _arg33.Select(v => new Tuple`2(v.Item1, v.Item2))) because no matching member found for constructor parameter: key.
 Structure	count over two for	n/a	
 Structure	exists over two for	n/a	

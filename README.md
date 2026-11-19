@@ -117,6 +117,8 @@ docker run -d -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
 The driver of MongoDB stores an object as it is, so a customer holds its orders and an order its lines, and a
 navigation of a scenario reads the embedded documents. The EF Core provider of MongoDB has no relationships between
 collections, so its model leaves the navigations out, and the scenarios that use them fail with it.
+"Structure / distinct and take after two for" takes a row of a query that has no order, so any row is right, and
+MongoDB, which groups in no fixed order, returns another one from run to run: it is `n/a` for the driver.
 
 Marten stores the JSON of an object, so it embeds the orders and the lines as the driver of MongoDB does. Since
 Marten 9 a query can only be read asynchronously: the test reads the rows with `ToListAsync`, and a scenario that
